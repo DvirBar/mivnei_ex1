@@ -10,10 +10,9 @@ world_cup_t::~world_cup_t()
 	// TODO: Your code goes here
 }
 
-
 StatusType world_cup_t::add_team(int teamId, int points)
 {
-	// TODO: Your code goes here
+	// TODO: Make sure that teamId is unique?
 	return StatusType::SUCCESS;
 }
 
@@ -24,7 +23,7 @@ StatusType world_cup_t::remove_team(int teamId)
 }
 
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
-                                   int goals, int cards, bool goalKeeper)
+								   int goals, int cards, bool goalKeeper)
 {
 	// TODO: Your code goes here
 	return StatusType::SUCCESS;
@@ -37,7 +36,7 @@ StatusType world_cup_t::remove_player(int playerId)
 }
 
 StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
-                                        int scoredGoals, int cardsReceived)
+											int scoredGoals, int cardsReceived)
 {
 	// TODO: Your code goes here
 	return StatusType::SUCCESS;
@@ -76,15 +75,15 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
 output_t<int> world_cup_t::get_all_players_count(int teamId)
 {
 	// TODO: Your code goes here
-    static int i = 0;
-    return (i++==0) ? 11 : 2;
+	static int i = 0;
+	return (i++ == 0) ? 11 : 2;
 }
 
 StatusType world_cup_t::get_all_players(int teamId, int *const output)
 {
 	// TODO: Your code goes here
-    output[0] = 4001;
-    output[1] = 4002;
+	output[0] = 4001;
+	output[1] = 4002;
 	return StatusType::SUCCESS;
 }
 
@@ -99,4 +98,3 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 	// TODO: Your code goes here
 	return 2;
 }
-
