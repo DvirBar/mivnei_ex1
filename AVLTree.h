@@ -45,4 +45,22 @@ private:
     void LRrotation(unique_ptr<AVLNode> root);
 };
 
+template <class T, class K>
+void AVLTree<T, K>::RLrotation(unique_ptr<AVLNode> root) {
+    unique_ptr<AVLNode> tempLeft = move(root->rightChild->leftChild->leftChild);
+    unique_ptr<AVLNode> tempRight = move(root->rightChild->leftChild->rightChild);
+    root->rightChild->leftChild->leftChild = move(root);
+    root->rightChild->leftChild->rightChild = move(root->rightChild);
+    tempLeft = 
+
+
+}
+
+template <class T, class K>
+void AVLTree<T, K>::RRrotation(unique_ptr<AVLNode> root) {
+    unique_ptr<AVLNode> tempNode = move(root->rightChild->leftChild);
+    root->rightChild->leftChild = move(root);
+    root->rightChild = move(tempNode);
+}
+
 #endif // AVLTREE_H_
