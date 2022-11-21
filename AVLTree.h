@@ -17,6 +17,8 @@ public:
     void addNode(const K &key, const T &data);
     void removeNode(const K &key);
     T &getNode(const K &key) const;
+    int getHeight() const;
+    bool isEmpty() const;
 
 private:
     class AVLNode
@@ -43,6 +45,30 @@ private:
     void LLrotation(unique_ptr<AVLNode> root);
     void RLrotation(unique_ptr<AVLNode> root);
     void LRrotation(unique_ptr<AVLNode> root);
+
+    unique_ptr<AVLNode> root;
+    void copyTree(const AVLTree &tree, AVLTree &newTree);
+    void emptyTree();
+};
+
+template <class T, class K>
+AVLTree<T, K>::AVLTree() : root(nullptr)
+{
+}
+
+template <class T, class K>
+AVLTree<T, K>::AVLTree(const AVLTree &tree)
+{
+}
+
+template <class T, class K>
+void AVLTree<T, K>::copyTree(const AVLTree &tree, AVLTree &newTree)
+{
+    assert(tree.isEmpty());
+    try
+    {
+        for (const)
+    }
 };
 
 #endif // AVLTREE_H_
