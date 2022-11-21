@@ -16,4 +16,4 @@ Player::Player(
     this->gamesPlayed = gamesPlayed;
     this->goals = goals;
     this->cards = cards;
-}
+};

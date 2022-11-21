@@ -16,7 +16,7 @@
 #define WORLDCUP23A1_H_
 
 #include "wet1util.h"
-#include "BinaryTree.h"
+#include "AVLTree.h"
 #include "Team.h"
 #include "Player.h"
 
@@ -25,8 +25,8 @@ using namespace std;
 class world_cup_t
 {
 private:
-	BinaryTree<unique_ptr<Team>> teams;
-	BinaryTree<shared_ptr<Player>> players;
+	AVLTree<unique_ptr<Team>> teams;
+	AVLTree<shared_ptr<Player>> players;
 
 public:
 	// <DO-NOT-MODIFY> {

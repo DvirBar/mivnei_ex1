@@ -2,7 +2,7 @@
 #define PLAYER_H_
 
 #include "wet1util.h"
-#include "BinaryTree.h"
+#include "AVLTree.h"
 
 class Player
 {
