@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "wet1util.h"
-#include "BinaryTree.h"
+#include "AVLTree.h"
 #include "Player.h"
 
 using namespace std;
@@ -23,7 +23,7 @@ private:
     int points;
     // TODO: Might need to update everything all at once
     // int totalGamesPlayed;
-    BinaryTree<shared_ptr<Player>> teamPlayers;
+    AVLTree<shared_ptr<Player>> teamPlayers;
 };
 
 #endif // TEAM_H_

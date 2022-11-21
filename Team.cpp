@@ -1,5 +1,5 @@
 #include "Team.h"
-#include "BinaryTree.h"
+#include "AVLTree.h"
 
 Team::Team(int teamId, int points)
 {
