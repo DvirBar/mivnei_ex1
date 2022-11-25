@@ -2,7 +2,7 @@
 #define AVLTREE_H_
 
 #include <memory>
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 
@@ -58,14 +58,36 @@ public:
 
 template <class T, class K>
 int AVLTree<T, K>::getBalanceFactor(AVLTree::AVLNode* node) {
-    if(node == nullptr)
-        return 0;
-    return (node->leftChild->height) - (node->rightChild->height);
+    int leftTreeHeight = 0, rightTreeHeight = 0;
+
+    if(node->rightChild == nullptr)
+        rightTreeHeight = -1;
+    else
+        rightTreeHeight = node->rightChild->height;
+
+    if(node->leftChild == nullptr)
+        leftTreeHeight = -1;
+    else
+        leftTreeHeight = node->leftChild->height;
+
+    return leftTreeHeight - rightTreeHeight;
 }
 
 template <class T, class K>
 void AVLTree<T, K>::updateHeight(AVLTree::AVLNode* node) {
-    node->height = max(node->leftChild->height, node->rightChild->height) + 1;
+    int leftTreeHeight = 0, rightTreeHeight = 0;
+
+    if(node->rightChild == nullptr)
+        rightTreeHeight = -1;
+    else
+        rightTreeHeight = node->rightChild->height;
+
+    if(node->leftChild == nullptr)
+        leftTreeHeight = -1;
+    else
+        leftTreeHeight = node->leftChild->height;
+
+    node->height = max(leftTreeHeight, rightTreeHeight) + 1;
 }
 
 template <class T, class K>
@@ -105,8 +127,10 @@ template <class T, class K>
 T& AVLTree<T, K>::searchByNode(const AVLTree::AVLNode* node, const K& key) {
     if(node == nullptr)
         return nullptr;
+
     if(node->key == key)
         return node->data;
+
     if(node->key > key)
         searchByNode(node->leftChild);
     else
@@ -152,10 +176,9 @@ typename AVLTree<T, K>::AVLNode* AVLTree<T, K>::insertByNode(AVLTree::AVLNode* n
 }
 
 
-
 template <class T, class K>
 typename AVLTree<T, K>::AVLNode* AVLTree<T, K>::insert(const K &key, const T &data) {
-    insertByNode(root, key, data);
+    root = insertByNode(root, key, data);
 }
 
 #endif // AVLTREE_H_
