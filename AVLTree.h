@@ -40,6 +40,7 @@ private:
     AVLNode* LLrotation(AVLNode* parent);
     AVLNode* RLrotation(AVLNode* parent);
     AVLNode* LRrotation(AVLNode* parent);
+    int getHeight(AVLNode* node);
     int getBalanceFactor(AVLNode* node);
     void updateHeight(AVLNode* node);
 
@@ -57,37 +58,20 @@ public:
 };
 
 template <class T, class K>
+int AVLTree<T, K>::getHeight(AVLTree::AVLNode* node) {
+    if(node == nullptr)
+        return -1;
+    return node->height;
+}
+
+template <class T, class K>
 int AVLTree<T, K>::getBalanceFactor(AVLTree::AVLNode* node) {
-    int leftTreeHeight = 0, rightTreeHeight = 0;
-
-    if(node->rightChild == nullptr)
-        rightTreeHeight = -1;
-    else
-        rightTreeHeight = node->rightChild->height;
-
-    if(node->leftChild == nullptr)
-        leftTreeHeight = -1;
-    else
-        leftTreeHeight = node->leftChild->height;
-
-    return leftTreeHeight - rightTreeHeight;
+    return getHeight(node->leftChild) - getHeight(node->rightChild);
 }
 
 template <class T, class K>
 void AVLTree<T, K>::updateHeight(AVLTree::AVLNode* node) {
-    int leftTreeHeight = 0, rightTreeHeight = 0;
-
-    if(node->rightChild == nullptr)
-        rightTreeHeight = -1;
-    else
-        rightTreeHeight = node->rightChild->height;
-
-    if(node->leftChild == nullptr)
-        leftTreeHeight = -1;
-    else
-        leftTreeHeight = node->leftChild->height;
-
-    node->height = max(leftTreeHeight, rightTreeHeight) + 1;
+    node->height = max(getHeight(node->leftChild), getHeight(node->rightChild)) + 1;
 }
 
 template <class T, class K>
