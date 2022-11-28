@@ -3,166 +3,385 @@
 
 #include <memory>
 #include <cmath>
+#include <exception>
 
 using namespace std;
 
-template <class T, class K>
+template <class K, class T>
 class AVLTree
 {
-private:
-
     class AVLNode
     {
     public:
         K key;
         T data;
-        AVLNode* rightChild;
-        AVLNode* leftChild;
-//        AVLNode* parent;
+        AVLNode *rightChild;
+        AVLNode *leftChild;
         int height;
 
-        /**
-         *  Constructor of AVLNode class.
-         *
-         *  @param data - a reference to data
-         */
-        AVLNode(const T &data, const K& key);
+        AVLNode(const K& key, const T& data);
 
         AVLNode(const AVLNode &) = default;
-        AVLNode &operator=(const AVLNode &) = default;
+        AVLNode& operator=(const AVLNode &) = default;
+
+        int getBalanceFactor() const;
+        void updateHeight();
+        int getHeight(AVLTree::AVLNode *node);
+
+        AVLNode* RRrotation();
+        AVLNode* LLrotation();
+        AVLNode* RLrotation();
+        AVLNode* LRrotation();
+        AVLNode* execRotation();
     };
 
     AVLNode* root;
-
-    T& searchByNode(const AVLNode* node, const K& key);
+    void execRemove(AVLNode* node, AVLNode* parent);
+    AVLNode* searchByNode(const AVLNode* node, const K& key);
     AVLNode* insertByNode(AVLNode* node, const K& key, const T& data);
-    AVLNode* RRrotation(AVLNode* parent);
-    AVLNode* LLrotation(AVLNode* parent);
-    AVLNode* RLrotation(AVLNode* parent);
-    AVLNode* LRrotation(AVLNode* parent);
-    int getHeight(AVLNode* node);
-    int getBalanceFactor(AVLNode* node);
-    void updateHeight(AVLNode* node);
-
+    T* removeAux(const K& key, AVLNode* node, AVLNode* parent);
+    static void deleteTreeAux(AVLNode* node);
+    
 public:
     AVLTree();
-    AVLTree(const AVLTree &tree);
-    AVLTree &operator=(const AVLTree &tree);
-    // TODO: Destructor?
+    AVLTree(const AVLTree &tree) = delete;
+    AVLTree& operator=(const AVLTree &tree) = delete;
+    ~AVLTree();
 
-    AVLNode* insert(const K &key, const T &data);
-    AVLNode* removeNode(const K &key);
-    T &search(const K &key) const;
+    AVLNode* insert(const K& key, const T& data);
+    T* remove(const K& key);
+    T& search(const K& key) const;
+    T& nextInorder(const K& currentKey) const;
+    T& prevInorder(const K& currentKey) const;
+    int getHeight() const;
+    bool isEmpty() const;
 
-
+    class KeyNotFound {};
+    class TreeIsEmpty {};
+    class NoNextInorder {};
+    class NoPrevInorder {};
 };
 
-template <class T, class K>
-int AVLTree<T, K>::getHeight(AVLTree::AVLNode* node) {
-    if(node == nullptr)
-        return -1;
-    return node->height;
+
+template <class K, class T>
+AVLTree<K, T>::AVLTree():
+    root(nullptr)
+{}
+
+template <class K, class T>
+AVLTree<K, T>::~AVLTree() {
+    deleteTreeAux(root);
 }
 
-template <class T, class K>
-int AVLTree<T, K>::getBalanceFactor(AVLTree::AVLNode* node) {
-    return getHeight(node->leftChild) - getHeight(node->rightChild);
+template <class K, class T>
+void AVLTree<K, T>::deleteTreeAux(AVLNode *node)
+{
+    if (node->leftChild != nullptr)
+    {
+        deleteNodeAux(node->leftChild);
+    }
+
+    if (node->rightChild != nullptr)
+    {
+        deleteNodeAux(node->rightChild);
+    }
+
+    delete node;
 }
 
-template <class T, class K>
-void AVLTree<T, K>::updateHeight(AVLTree::AVLNode* node) {
-    node->height = max(getHeight(node->leftChild), getHeight(node->rightChild)) + 1;
-}
+template<class K, class T>
+AVLTree<K, T>::AVLNode::AVLNode(const K& key, const T& data):
+    key(key),
+    data(data),
+    height(1),
+    leftChild(nullptr),
+    rightChild(nullptr)
+{}
+ 
 
-template <class T, class K>
-typename AVLTree<T, K>::AVLNode* AVLTree<T, K>::RLrotation(AVLTree::AVLNode* parent) {
-    AVLTree::AVLNode* parentRight = parent->rightChild;
-    AVLTree::AVLNode* newParent = parentRight->leftChild;
-    AVLTree::AVLNode* newParentLeft = newParent->leftChild;
-    AVLTree::AVLNode* newParentRight = newParent->rightChild;
+template<class K, class T>
+typename AVLTree<K, T>::AVLNode *AVLTree<K, T>::AVLNode::RRrotation()
+{
+    AVLNode* newParent = rightChild;
+    AVLNode* rightGrandChild = newParent->leftChild;
 
-    newParent->leftChild = parent;
-    newParent->rightChild = parentRight;
-    parent->rightChild = newParentLeft;
-    parentRight->leftChild = newParentRight;
+    newParent->leftChild = this;
+    rightChild = rightGrandChild;
 
-    updateHeight(parent);
-    updateHeight(parentRight);
-    updateHeight(newParent);
+    updateHeight();
+    newParent->updateHeight();
 
     return newParent;
 }
 
-template <class T, class K>
-typename AVLTree<T, K>::AVLNode* AVLTree<T, K>::RRrotation(AVLTree::AVLNode* parent) {
-    AVLTree::AVLNode* newParent = parent->rightChild;
-    AVLTree::AVLNode* parentRightLeft = newParent->leftChild;
+template <class K, class T>
+typename AVLTree<K, T>::AVLNode *AVLTree<K, T>::AVLNode::LLrotation()
+{
+    AVLNode* newParent = leftChild;
+    AVLNode* newLeftGrandChild = newParent->rightChild;
 
-    newParent->leftChild = parent;
-    parent->rightChild = parentRightLeft;
+    newParent->rightChild = this;
+    leftChild = newLeftGrandChild;
 
-    updateHeight(parent);
-    updateHeight(newParent);
+    updateHeight();
+    newParent->updateHeight();
 
     return newParent;
 }
 
-template <class T, class K>
-T& AVLTree<T, K>::searchByNode(const AVLTree::AVLNode* node, const K& key) {
-    if(node == nullptr)
+template <class K, class T>
+typename AVLTree<K, T>::AVLNode* AVLTree<K, T>::AVLNode::RLrotation()
+{
+    rightChild->LLrotation();
+    AVLNode* newParent = RRrotation();
+
+    return newParent;
+}
+
+template <class K, class T>
+typename AVLTree<K, T>::AVLNode* AVLTree<K, T>::AVLNode::LRrotation()
+{
+    leftChild->RRrotation();
+    AVLNode* newParent = LLrotation();
+    return newParent;
+}
+
+template <class K, class T>
+typename AVLTree<K, T>::AVLNode* AVLTree<K, T>::searchByNode(const AVLTree::AVLNode* node, const K& key) {
+    if (node == nullptr)
         return nullptr;
 
-    if(node->key == key)
-        return node->data;
+    if (node->key == key)
+        return node;
 
-    if(node->key > key)
+    if (node->key > key)
         searchByNode(node->leftChild);
     else
         searchByNode(node->rightChild);
 }
 
-template <class T, class K>
-T& AVLTree<T, K>::search(const K &key) const {
-    return searchByNode(root);
+template <class K, class T>
+T& AVLTree<K, T>::search(const K &key) const {
+    return searchByNode(root, key)->data;
 }
 
-template <class T, class K>
-typename AVLTree<T, K>::AVLNode* AVLTree<T, K>::insertByNode(AVLTree::AVLNode* node, const K& key, const T& data) {
-    if(node == nullptr) {
-        AVLTree::AVLNode* newLeaf = new AVLTree::AVLNode(data, key);
-        return newLeaf;
+template <class K, class T>
+typename AVLTree<K, T>::AVLNode *AVLTree<K, T>::insertByNode(AVLTree::AVLNode *node, const K &key, const T &data) {
+    if (node == nullptr) {
+        try {
+            AVLTree::AVLNode *newLeaf = new AVLTree::AVLNode(data, key);
+            return newLeaf;
+        }
+        catch (const bad_alloc &error) {
+            throw error;
+        }
     }
-    if(node->key > key)
+    if (node->key > key)
         node->leftChild = insertByNode(node->leftChild, key, data);
     else
-        node->rightChild= insertByNode(node->rightChild, key, data);
+        node->rightChild = insertByNode(node->rightChild, key, data);
 
-    updateHeight(node);
-
-    int nodeBF = getBalanceFactor(node);
-    int nodeLeftChildBF = getBalanceFactor(node->leftChild);
-    int nodeRightChildBF = getBalanceFactor(node->rightChild);
-
-    if((nodeBF == 2) && (nodeLeftChildBF == -1))
-        return LRrotation(node);
-
-    if((nodeBF == 2) && (nodeLeftChildBF >= 0))
-        return LLrotation(node);
-
-    if((nodeBF == -2) && (nodeRightChildBF == 1))
-        return RLrotation(node);
-
-    if((nodeBF == -2) && (nodeRightChildBF <= 0))
-        return RRrotation(node);
-
-    return node;
-
+    node->updateHeight();
+    return node->execRotation();
 }
 
+template <class K, class T>
+typename AVLTree<K, T>::AVLNode *AVLTree<K, T>::AVLNode::execRotation()
+{
+    int nodeBF = getBalanceFactor();
+    int nodeLeftChildBF = leftChild->getBalanceFactor();
+    int nodeRightChildBF = rightChild->getBalanceFactor();
+
+    if ((nodeBF == 2) && (nodeLeftChildBF == -1))
+        return LRrotation();
+
+    if ((nodeBF == 2) && (nodeLeftChildBF >= 0))
+        return LLrotation();
+
+    if ((nodeBF == -2) && (nodeRightChildBF == 1))
+        return RLrotation();
+
+    if ((nodeBF == -2) && (nodeRightChildBF <= 0))
+        return RRrotation();
+
+    return this;
+}
+
+template <class K, class T>
+typename AVLTree<K, T>::AVLNode *AVLTree<K, T>::insert(const K &key, const T &data)
+{
+    root = insertByNode(root, key, data);
+    return root;
+};
 
 template <class T, class K>
-typename AVLTree<T, K>::AVLNode* AVLTree<T, K>::insert(const K &key, const T &data) {
-    root = insertByNode(root, key, data);
+int AVLTree<T, K>::AVLNode::getHeight(AVLTree::AVLNode *node) {
+    if (node == nullptr)
+        return -1;
+    return node->height;
 }
 
+template <class K, class T>
+void AVLTree<K, T>::AVLNode::updateHeight() {
+    height = max(leftChild->getHeight(), rightChild->getHeight()) + 1;
+}
+
+template <class K, class T>
+int AVLTree<K, T>::AVLNode::getBalanceFactor() const {
+    return leftChild->getHeight() - rightChild->getHeight();
+}
+
+template <class K, class T>
+T* AVLTree<K, T>::remove(const K &key) {
+    if(isEmpty()) {
+        throw TreeIsEmpty();
+    }
+    
+    T* node = removeAux(key, root, nullptr);
+    if(node == nullptr) {
+        throw KeyNotFound();
+    }
+    
+    return node;
+}
+
+template <class K, class T>
+T* AVLTree<K, T>::removeAux(const K& key, AVLNode* node, AVLNode* parent) {
+    T* result = nullptr;
+    
+    if(node->key == key) {
+        // Assumption - T has a copy c'tor
+        T data = node->data;
+        execRemove(node, parent);
+        return &data;
+    }
+    
+    if(node->key > key) {
+        if(node->leftChild == nullptr) {
+            return nullptr;
+        }
+        
+        result = removeAux(key, node->leftChild, node);
+     }
+    
+    if(node->key < key) {
+        if(node->rightChild == nullptr) {
+            return nullptr;
+        }
+        
+        result = removeAux(key, node->rightChild, node);
+    }
+    
+    if(result != nullptr) {
+        node->execRotation();
+    }
+    
+    return result;
+}
+
+
+template <class K, class T>
+void AVLTree<K, T>::execRemove(AVLNode* node, AVLNode *parent) {
+    AVLNode* targetNode = node;
+    AVLNode* targetParent = parent;
+    if (node->leftChild != nullptr && node->rightChild != nullptr) {
+        *targetNode = node->rightChild;
+        targetParent = node;
+
+        while (targetNode->leftChild != nullptr) {
+            targetParent = targetNode;
+            targetNode = targetNode->leftChild;
+        }
+        this->key = targetNode->key;
+        this->data = targetNode->data;
+    }
+
+    AVLNode *targetChild;
+    if (targetNode->leftChild != nullptr) {
+        if(parent != nullptr) {
+            if (targetParent->leftChild == targetNode) {
+                targetParent->leftChild = targetNode->leftChild;
+            }
+            else {
+                targetParent->rightChild = targetNode->leftChild;
+            }
+        } else {
+            root = targetNode->leftChild;
+        }
+        
+    }
+    
+    else {
+        if (targetParent->leftChild == targetChild) {
+            targetParent->leftChild = targetNode->rightChild;
+        }
+        else {
+            targetChild->rightChild = targetChild->rightChild;
+        }
+    }
+    
+
+    if (targetNode->height() == 0) {
+        delete node;
+    }
+}
+
+template<class K, class T>
+T& AVLTree<K, T>::nextInorder(const K& currentKey) const {
+    AVLNode* node = searchByNode(root, currentKey);
+    AVLNode* next = node->rightChild;
+    if(next != nullptr) {
+        while(next->leftChild != nullptr) {
+            next = next->leftChild;
+        }
+        
+        return next->data;
+    }
+    
+    next = nullptr;
+    
+    AVLNode* treeRoot = root;
+    while(treeRoot != nullptr) {
+        if(node->key < treeRoot->key) {
+            next = treeRoot;
+            treeRoot = treeRoot->leftChild;
+        } else if(node->key > treeRoot->key) {
+            treeRoot = treeRoot->rightChild;
+        } else if(next != nullptr) {
+            
+            return next->data;
+        }
+    }
+    
+    throw NoNextInorder();
+}
+
+template<class K, class T>
+T& AVLTree<K, T>::prevInorder(const K& currentKey) const {
+    AVLNode* node = searchByNode(root, currentKey);
+    AVLNode* next = node->leftChild;
+    if(next != nullptr) {
+        while(next->rightChild != nullptr) {
+            next = next->rightChild;
+        }
+        
+        return next->data;
+    }
+    
+    next = nullptr;
+    
+    AVLNode* treeRoot = root;
+    while(treeRoot != nullptr) {
+        if(node->key < treeRoot->key) {
+            treeRoot = treeRoot->leftChild;
+        }  else if(node->key > treeRoot->key) {
+            next = treeRoot;
+            treeRoot = treeRoot->rightChild;
+        } else if(next != nullptr) {
+            return next->data;
+        }
+    }
+    
+    throw NoPrevInorder();
+}
 #endif // AVLTREE_H_
