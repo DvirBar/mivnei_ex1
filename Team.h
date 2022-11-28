@@ -8,8 +8,14 @@
 
 using namespace std;
 
-class Team
+enum struct GameResult
 {
+    WON = 0,
+    LOST = 1,
+    TIE = 2
+};
+
+class Team {
     Team(int teamId, int points);
     Team(const Team &team);
     ~Team();
@@ -17,13 +23,20 @@ class Team
     StatusType add_team(int teamId, int points);
     StatusType remove_team(int teamId);
     output_t<int> get_team_points(int teamId);
+    int get_top_scorer();
+    int get_all_players_count();
+    StatusType get_all_players(int* const output);
+    output_t<int> get_closest_player(int playerId, int teamId);
+    void conclude_game(GameResult result);
+    static StatusType unite_teams(int teamId1, int teamId2, int newTeamId);
 
 private:
     int teamId;
     int points;
-    // TODO: Might need to update everything all at once
+    int num_players;
+    int num_goalkeepers;
     // int totalGamesPlayed;
-    AVLTree<shared_ptr<Player>> teamPlayers;
+    AVLTree<int, Player*> team_players;
 };
 
 #endif // TEAM_H_

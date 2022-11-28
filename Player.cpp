@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Team.h"
 
 Player::Player(
     int playerId, int teamId, int gamesPlayed, int goals,
@@ -10,10 +11,13 @@ Player::Player(
         // TODO: Throw an error
         return;
     }
+    
+    // TODO: find team and add it
 
     this->playerId = playerId;
-    this->teamId = teamId;
     this->gamesPlayed = gamesPlayed;
     this->goals = goals;
     this->cards = cards;
 };
+
+
