@@ -9,8 +9,7 @@
 class Team;
 
 class Player {
-public:
-    Player(int playerId, int teamId, int gamesPlayed, int goals,
+    Player(int playerId, Team* team, int gamesPlayed, int goals,
            int cards, bool goalKeeper);
 
     // playerId should be unique, so maybe we shouldn't allow copy?

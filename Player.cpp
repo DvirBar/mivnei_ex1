@@ -1,19 +1,19 @@
 #include "Player.h"
 #include "Team.h"
+#include "Exception.h"
 
 Player::Player(
-    int playerId, int teamId, int gamesPlayed, int goals,
-    int cards, bool goalKeeper) : goalKeeper(goalKeeper)
+    int playerId, Team* team, int gamesPlayed, int goals,
+    int cards, bool goalKeeper):
+    goalKeeper(goalKeeper),
+    team(team),
+    closestPlayerId(0)
 {
-    if (playerId <= 0 || teamId <= 0 || gamesPlayed < 0 || goals < 0 ||
-        cards < 0 || (gamesPlayed == 0 && (goals > 0 || cards > 0)))
-    {
-        // TODO: Throw an error
-        return;
+    if (playerId <= 0 || gamesPlayed < 0 || goals < 0 ||
+        cards < 0 || (gamesPlayed == 0 && (goals > 0 || cards > 0))) {
+        throw InvalidArgumets();
     }
     
-    // TODO: find team and add it
-
     this->playerId = playerId;
     this->gamesPlayed = gamesPlayed;
     this->goals = goals;

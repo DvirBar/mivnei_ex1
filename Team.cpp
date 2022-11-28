@@ -15,15 +15,15 @@ Team::Team(int teamId, int points)
 }
 
 int Team::getNumPlayers() const {
-    return num_players;
+    return numPlayers;
 }
 
 int Team::getNumGoalKeepers() const {
-    return num_goalkeepers;
+    return numGoalkeepers;
 }
 
 bool Team::isValidTeam() const {
-    return ((num_players >= 11) && (num_goalkeepers > 0));
+    return ((numPlayers >= 11) && (numGoalkeepers > 0));
 }
 
 void Team::addPoints(int pointsToAdd) {

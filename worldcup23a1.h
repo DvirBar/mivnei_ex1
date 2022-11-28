@@ -19,17 +19,17 @@
 #include "AVLTree.h"
 #include "Team.h"
 #include "Player.h"
+#include "Tuple.h"
 
 using namespace std;
 
-class world_cup_t
-{
+class world_cup_t {
 private:
 	AVLTree<int, Team*> teams;
 	AVLTree<int, Player*> playersByID;
+    AVLTree<Tuple, Player*> playersByStats;
     int topScorer;
-
-
+    
 public:
 	// <DO-NOT-MODIFY> {
 

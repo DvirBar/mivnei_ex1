@@ -1,4 +1,6 @@
 #include "worldcup23a1.h"
+#include "Team.h"
+#include "Player.h"
 
 world_cup_t::world_cup_t()
 {
@@ -31,7 +33,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 
 StatusType world_cup_t::remove_player(int playerId)
 {
-	// TODO: Your code goes here
+	
 	return StatusType::SUCCESS;
 }
 
@@ -97,11 +99,6 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 
 output_t<int> world_cup_t::get_top_scorer(int teamId)
 {
-    if(teamId == 0) {
-        output_t<int> invalidInput = output_t<int>(StatusType::INVALID_INPUT);
-        return invalidInput;
-    }
-
     if(teamId > 0) {
         Team* checkTeam = teams.search(teamId);
         if(checkTeam == nullptr) {
@@ -124,6 +121,9 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
             return successPlayer;
         }
     }
+    
+    output_t<int> invalidInput = output_t<int>(StatusType::INVALID_INPUT);
+    return invalidInput;
 }
 
 output_t<int> world_cup_t::get_all_players_count(int teamId)
