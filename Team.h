@@ -16,6 +16,7 @@ enum struct GameResult
 };
 
 class Team {
+public:
     Team(int teamId, int points);
     Team(const Team &team);
     ~Team();
@@ -24,7 +25,14 @@ class Team {
     StatusType remove_team(int teamId);
     output_t<int> get_team_points(int teamId);
     int get_top_scorer();
-    int get_all_players_count();
+    int getNumPlayers () const;
+    int getNumGoalKeepers() const;
+    bool isValidTeam() const;
+    void addPoints(int pointsToAdd);
+    void addGames(int numGamesToAdd);
+    int getTotalGoals() const;
+    int getTotalCards() const;
+    int getTotalPoints() const;
     StatusType get_all_players(int* const output);
     output_t<int> get_closest_player(int playerId, int teamId);
     void conclude_game(GameResult result);
@@ -32,10 +40,13 @@ class Team {
 
 private:
     int teamId;
-    int points;
+    int totalPoints;
+    int totalCards;
+    int totalGoals;
     int num_players;
     int num_goalkeepers;
-    // int totalGamesPlayed;
+    int teamtopScorer;
+    int totalGamesPlayed;
     AVLTree<int, Player*> team_players;
 };
 

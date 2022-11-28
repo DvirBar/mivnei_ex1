@@ -9,6 +9,7 @@
 class Team;
 
 class Player {
+public:
     Player(int playerId, int teamId, int gamesPlayed, int goals,
            int cards, bool goalKeeper);
 

@@ -25,8 +25,10 @@ using namespace std;
 class world_cup_t
 {
 private:
-	AVLTree<unique_ptr<Team>> teams;
-	AVLTree<shared_ptr<Player>> players;
+	AVLTree<int, Team*> teams;
+	AVLTree<int, Player*> playersByID;
+    int topScorer;
+
 
 public:
 	// <DO-NOT-MODIFY> {

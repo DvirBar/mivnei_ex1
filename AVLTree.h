@@ -37,7 +37,7 @@ class AVLTree
 
     AVLNode* root;
     void execRemove(AVLNode* node, AVLNode* parent);
-    AVLNode* searchByNode(const AVLNode* node, const K& key);
+    static const AVLNode* searchByNode(const AVLNode* node, const K& key);
     AVLNode* insertByNode(AVLNode* node, const K& key, const T& data);
     T* removeAux(const K& key, AVLNode* node, AVLNode* parent);
     static void deleteTreeAux(AVLNode* node);
@@ -50,10 +50,10 @@ public:
 
     AVLNode* insert(const K& key, const T& data);
     T* remove(const K& key);
-    T& search(const K& key) const;
-    T& nextInorder(const K& currentKey) const;
-    T& prevInorder(const K& currentKey) const;
-    int getHeight() const;
+    const T& search(const K& key) const;
+    const T& nextInorder(const K& currentKey) const;
+    const T& prevInorder(const K& currentKey) const;
+//    int getHeight() const;
     bool isEmpty() const;
 
     class KeyNotFound {};
@@ -78,12 +78,12 @@ void AVLTree<K, T>::deleteTreeAux(AVLNode *node)
 {
     if (node->leftChild != nullptr)
     {
-        deleteNodeAux(node->leftChild);
+        deleteTreeAux(node->leftChild);
     }
 
     if (node->rightChild != nullptr)
     {
-        deleteNodeAux(node->rightChild);
+        deleteTreeAux(node->rightChild);
     }
 
     delete node;
@@ -93,7 +93,7 @@ template<class K, class T>
 AVLTree<K, T>::AVLNode::AVLNode(const K& key, const T& data):
     key(key),
     data(data),
-    height(1),
+    height(0),
     leftChild(nullptr),
     rightChild(nullptr)
 {}
@@ -147,7 +147,7 @@ typename AVLTree<K, T>::AVLNode* AVLTree<K, T>::AVLNode::LRrotation()
 }
 
 template <class K, class T>
-typename AVLTree<K, T>::AVLNode* AVLTree<K, T>::searchByNode(const AVLTree::AVLNode* node, const K& key) {
+const typename AVLTree<K, T>::AVLNode* AVLTree<K, T>::searchByNode(const AVLTree::AVLNode* node, const K& key) {
     if (node == nullptr)
         return nullptr;
 
@@ -155,14 +155,14 @@ typename AVLTree<K, T>::AVLNode* AVLTree<K, T>::searchByNode(const AVLTree::AVLN
         return node;
 
     if (node->key > key)
-        searchByNode(node->leftChild);
+        searchByNode(node->leftChild, key);
     else
-        searchByNode(node->rightChild);
+        searchByNode(node->rightChild, key);
 }
 
 template <class K, class T>
-T& AVLTree<K, T>::search(const K &key) const {
-    return searchByNode(root, key)->data;
+const T& AVLTree<K, T>::search(const K &key) const {
+    return (searchByNode(root, key))->data;
 }
 
 template <class K, class T>
@@ -327,7 +327,7 @@ void AVLTree<K, T>::execRemove(AVLNode* node, AVLNode *parent) {
 }
 
 template<class K, class T>
-T& AVLTree<K, T>::nextInorder(const K& currentKey) const {
+const T& AVLTree<K, T>::nextInorder(const K& currentKey) const {
     AVLNode* node = searchByNode(root, currentKey);
     AVLNode* next = node->rightChild;
     if(next != nullptr) {
@@ -357,7 +357,7 @@ T& AVLTree<K, T>::nextInorder(const K& currentKey) const {
 }
 
 template<class K, class T>
-T& AVLTree<K, T>::prevInorder(const K& currentKey) const {
+const T& AVLTree<K, T>::prevInorder(const K& currentKey) const {
     AVLNode* node = searchByNode(root, currentKey);
     AVLNode* next = node->leftChild;
     if(next != nullptr) {
@@ -381,7 +381,7 @@ T& AVLTree<K, T>::prevInorder(const K& currentKey) const {
             return next->data;
         }
     }
-    
+
     throw NoPrevInorder();
 }
 #endif // AVLTREE_H_

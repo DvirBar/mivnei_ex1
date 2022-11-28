@@ -10,6 +10,38 @@ Team::Team(int teamId, int points)
     }
 
     this->teamId = teamId;
-    this->points = points;
+    this->totalPoints = points;
     // TOOD: init teamPlayers
+}
+
+int Team::getNumPlayers() const {
+    return num_players;
+}
+
+int Team::getNumGoalKeepers() const {
+    return num_goalkeepers;
+}
+
+bool Team::isValidTeam() const {
+    return ((num_players >= 11) && (num_goalkeepers > 0));
+}
+
+void Team::addPoints(int pointsToAdd) {
+    totalPoints += pointsToAdd;
+}
+
+void Team::addGames(int numGamesToAdd) {
+    totalGamesPlayed += numGamesToAdd;
+}
+
+int Team::getTotalGoals() const {
+    return totalGoals;
+}
+
+int Team::getTotalCards() const {
+    return totalCards;
+}
+
+int Team::getTotalPoints() const {
+    return totalPoints;
 }
