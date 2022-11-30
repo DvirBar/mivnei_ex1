@@ -9,6 +9,7 @@
 class Team;
 
 class Player {
+public:
     Player(int playerId, Team* team, int gamesPlayed, int goals,
            int cards, bool goalKeeper);
 
@@ -19,6 +20,7 @@ class Player {
     StatusType update_stats(int gamesPlayed, int scoredGoals,
                                    int cardsReceived);
     output_t<int> get_num_played_games();
+    int getID() const;
 
 private:
     static const int MAX_CLOSEST = 2;

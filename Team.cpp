@@ -1,5 +1,6 @@
 #include "Team.h"
 #include "AVLTree.h"
+#include "Tuple.h"
 
 Team::Team(int teamId, int points)
 {
@@ -45,3 +46,8 @@ int Team::getTotalCards() const {
 int Team::getTotalPoints() const {
     return totalPoints;
 }
+
+const AVLTree<Tuple, Player *>& Team::getStatsTree() const {
+    return teamPlayersByStats;
+}
+

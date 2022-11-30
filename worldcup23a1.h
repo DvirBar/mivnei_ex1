@@ -29,6 +29,7 @@ private:
 	AVLTree<int, Player*> playersByID;
     AVLTree<Tuple, Player*> playersByStats;
     int topScorer;
+    int numPlayersOverall;
     
 public:
 	// <DO-NOT-MODIFY> {

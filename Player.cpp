@@ -20,4 +20,8 @@ Player::Player(
     this->cards = cards;
 };
 
+int Player::getID() const {
+    return playerId;
+}
+
 
