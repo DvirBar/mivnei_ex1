@@ -1,8 +1,9 @@
 #ifndef Exception_h
 #define Exception_h
-#include <exception>
 
-class InvalidArgumets: public exception {}
-
-
+class InvalidArgumets{};
+class KeyNotFound {};
+class TreeIsEmpty {};
+class NoNextInorder {};
+class NoPrevInorder {};
 #endif /* Exception_h */

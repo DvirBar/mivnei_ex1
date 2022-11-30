@@ -21,6 +21,7 @@ class Player {
     output_t<int> get_num_played_games();
 
 private:
+    static const int MAX_CLOSEST = 2;
     int playerId;
     int gamesPlayed;
     int goals;
@@ -28,6 +29,7 @@ private:
     bool goalKeeper;
     Team* team;
     int closestPlayerId;
+    int refByClosest[MAX_CLOSEST];
 };
 
 #endif // PLAYER_H_

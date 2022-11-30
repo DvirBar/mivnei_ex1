@@ -1,6 +1,7 @@
 #include "worldcup23a1.h"
 #include "Team.h"
 #include "Player.h"
+#include "Exception.h"
 
 world_cup_t::world_cup_t()
 {
@@ -20,8 +21,22 @@ StatusType world_cup_t::add_team(int teamId, int points)
 
 StatusType world_cup_t::remove_team(int teamId)
 {
-	// TODO: Your code goes here
-	return StatusType::FAILURE;
+    if(teamId <= 0) {
+        return StatusType::INVALID_INPUT;
+    }
+    try {
+        Team* team = teams.search(teamId);
+        if(team->getNumPlayers() > 0) {
+            return StatusType::FAILURE;
+        }
+        teams.remove(teamId);
+    } catch(const KeyNotFound& error) {
+        return StatusType::FAILURE;
+    } catch(const bad_alloc& error) {
+        return StatusType::ALLOCATION_ERROR;
+    }
+    
+	return StatusType::SUCCESS;
 }
 
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
@@ -33,7 +48,6 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 
 StatusType world_cup_t::remove_player(int playerId)
 {
-	
 	return StatusType::SUCCESS;
 }
 
