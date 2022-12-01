@@ -93,6 +93,8 @@ StatusType world_cup_t::remove_player(int playerId)
         
         lastClosest->updateClosest(findPlayerClosest(lastClosest->getStatsTuple()));
         lastRefBy->updateClosest(findPlayerClosest(lastRefBy->getStatsTuple()));
+
+        removedPlayer->removeFromTeam();
     } catch(const KeyNotFound& error) {
         return StatusType::INVALID_INPUT;
     } catch(const bad_alloc& error) {

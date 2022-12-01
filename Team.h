@@ -39,6 +39,7 @@ public:
     StatusType get_all_players(int* const output);
     void conclude_game(GameResult result);
     static StatusType unite_teams(int teamId1, int teamId2, int newTeamId);
+    void removePlayer(int playerId);
 
     class TeamNotFound: public exception{};
 private:

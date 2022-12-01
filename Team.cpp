@@ -51,3 +51,9 @@ const AVLTree<Tuple, Player *>& Team::getStatsTree() const {
     return teamPlayersByStats;
 }
 
+
+void Team::removePlayer(int playerId) {
+    teamPlayersByID.remove(playerId);
+    teamPlayersByID.remove(playerId);
+}
+

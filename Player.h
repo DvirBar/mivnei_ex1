@@ -26,7 +26,7 @@ public:
     void updateRefBy(int refById);
     int getClosestId() const;
     int getRefById() const;
-    
+    void removeFromTeam();
     Tuple getStatsTuple();
 
 private:

@@ -20,6 +20,10 @@ Player::Player(
     this->cards = cards;
 };
 
+void Player::removeFromTeam() {
+    team->removePlayer(playerId);
+}
+
 int Player::getId() const {
     return playerId;
 }
