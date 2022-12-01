@@ -20,4 +20,8 @@ Player::Player(
     this->cards = cards;
 };
 
+void Player::updateClosest(int closestId) {
+    closestPlayerId = closestId;
+}
+
 

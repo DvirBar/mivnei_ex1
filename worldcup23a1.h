@@ -30,6 +30,9 @@ private:
     AVLTree<Tuple, Player*> playersByStats;
     int topScorer;
     
+    // Excecutes on insert and remove player to find closest in O(log(n))
+    Player* findPlayerClosest(Tuple statsTuple) const;
+    
 public:
 	// <DO-NOT-MODIFY> {
 

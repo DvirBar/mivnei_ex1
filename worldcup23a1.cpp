@@ -48,7 +48,24 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 
 StatusType world_cup_t::remove_player(int playerId)
 {
-	return StatusType::SUCCESS;
+    if(playerId <= 0) {
+        return StatusType::INVALID_INPUT;
+    }
+    
+    try {
+        Player* removedPlayer = playersByID.remove(playerId);
+        playersByStats.remove(playerId);
+        Player* lastClosest = playersByID.search(removedPlayer->getClosestId());
+        Player* lastRefBy = playersByID.search(removedPlayer->getRefById());
+        
+        lastClosest->updateClosest(findPlayerClosest(lastClosest->getStatsTuple()));
+        lastRefBy->updateClosest(findPlayerClosest(lastRefBy->getStatsTuple()));
+    } catch(const KeyNotFound& error) {
+        return StatusType::INVALID_INPUT;
+    } catch(const bad_alloc& error) {
+        return StatusType::ALLOCATION_ERROR;
+    }
+    return StatusType::SUCCESS;
 }
 
 StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
