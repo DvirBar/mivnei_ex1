@@ -5,6 +5,7 @@
 #include "wet1util.h"
 #include "AVLTree.h"
 #include "Player.h"
+#include "Tuple.h"
 
 using namespace std;
 
@@ -34,6 +35,7 @@ public:
     int getTotalGoals() const;
     int getTotalCards() const;
     int getTotalPoints() const;
+    const AVLTree<Tuple, Player*>& getStatsTree() const;
     StatusType get_all_players(int* const output);
     void conclude_game(GameResult result);
     static StatusType unite_teams(int teamId1, int teamId2, int newTeamId);
@@ -48,7 +50,8 @@ private:
     int numGoalkeepers;
     int teamTopScorer;
     int totalGamesPlayed;
-    AVLTree<int, Player*> teamPlayers;
+    AVLTree<int, Player*> teamPlayersByID;
+    AVLTree<Tuple, Player*> teamPlayersByStats;
 };
 
 #endif // TEAM_H_

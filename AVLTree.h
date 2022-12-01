@@ -40,6 +40,7 @@ class AVLTree
     };
     
     AVLNode* root;
+//    int numNodes;
     void execRemove(AVLNode* node, AVLNode* parent);
     static const AVLNode* searchByNode(const AVLNode* node, const K& key);
     AVLNode* insertByNode(AVLNode* node, const K& key, const T& data);
@@ -47,6 +48,7 @@ class AVLTree
     static int getNodeBalanceFactor(AVLNode* node);
     static int getNodeHeight(AVLNode* node);
     static void deleteTreeAux(AVLNode* node);
+    static void inorderToArrayAUX(const AVLNode* node, T* array);
     
     
 public:
@@ -57,9 +59,12 @@ public:
 
     AVLNode* insert(const K& key, const T& data);
     T remove(const K& key);
+    bool isExist(const K& key) const;
     const T& search(const K& key) const;
     const T& nextInorder(const K& currentKey) const;
     const T& prevInorder(const K& currentKey) const;
+    void inorderDataToArray(T* array) const;
+//    int getNumNodes() const;
 //    int getHeight() const;
     bool isEmpty() const;
     void printTree() const;
@@ -70,12 +75,18 @@ public:
 template <class K, class T>
 AVLTree<K, T>::AVLTree():
     root(nullptr)
+//    numNodes(0)
 {}
 
 template <class K, class T>
 AVLTree<K, T>::~AVLTree() {
     deleteTreeAux(root);
 }
+
+//template <class K, class T>
+//int AVLTree<K, T>::getNumNodes() const {
+//    return numNodes;
+//}
 
 template <class K, class T>
 void AVLTree<K, T>::deleteTreeAux(AVLNode *node)
@@ -214,6 +225,7 @@ template <class K, class T>
 typename AVLTree<K, T>::AVLNode *AVLTree<K, T>::insert(const K &key, const T &data)
 {
     root = insertByNode(root, key, data);
+//    numNodes++;
     return root;
 };
 
@@ -245,6 +257,7 @@ T AVLTree<K, T>::remove(const K &key) {
     }
     
     T data = removeAux(key, root, nullptr);
+//    numNodes--;
     return data;
 }
 
@@ -439,4 +452,32 @@ void AVLTree<K, T>::printTree() const {
     print2DUtil(root, 0);
     cout << "---------------" << endl;
 }
+
+template<class K, class T>
+void AVLTree<K, T>::inorderToArrayAUX(const AVLNode* node, T* array) {
+    if(node != nullptr) {
+        inorderToArrayAUX(node->leftChild, array);
+        *array = node->data;
+        array++;
+        inorderToArrayAUX(node->rightChild, array);
+    }
+}
+
+template<class K, class T>
+void AVLTree<K, T>::inorderDataToArray(T* array) const {
+    inorderToArrayAUX(root, array);
+}
+
+template<class K, class T>
+bool AVLTree<K, T>::isExist(const K &key) const {
+    try {
+        search(key);
+    }
+    catch(const KeyNotFound& keyNotFound) {
+        return false;
+    }
+    return true;
+}
+
+
 #endif // AVLTREE_H_

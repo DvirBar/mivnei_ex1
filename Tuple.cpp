@@ -1,54 +1,28 @@
 #include "Tuple.h"
 
 
-Tuple::Tuple(int size):
-    size(size)
-{
-    if(size <= 0) {
-        throw InvalidSize();
-    }
-    
-    data = new int[size];
-}
+Tuple::Tuple(int primary, int secondary, int tertiary) :
+primaryValue(primary),
+secondaryValue(secondary),
+tertiaryValue(tertiary)
+{}
 
-Tuple::Tuple(const Tuple& tuple):
-    size(tuple.size),
-    data(new int[tuple.size])
-{
-    for(int i=0; i<size; i++) {
-        data[i] = tuple.data[i];
-    }
-}
+bool operator>(const Tuple& tuple1, const Tuple& tuple2) {
+    if(tuple1.primaryValue > tuple2.primaryValue)
+        return true;
 
-Tuple& Tuple::operator=(const Tuple& tuple) {
-    if(this == &tuple) {
-        return *this;
-    }
-    
-    if(tuple.size != size) {
-        throw TupleSizesDontMatch();
-    }
-    
-    delete[] data;
-    size = tuple.size;
-    for (int i=0; i<=size; i++) {
-        data[i] = tuple.data[i];
-    }
-    
-    return *this;
-}
+    if(tuple1.primaryValue == tuple2.primaryValue) {
+        if(tuple1.secondaryValue < tuple2.secondaryValue)
+            return true;
 
-Tuple::~Tuple() {
-    delete[] data;
-}
+        if(tuple1.secondaryValue == tuple2.secondaryValue)
+            return tuple1.tertiaryValue > tuple2.tertiaryValue;
 
-void Tuple::insertInIndex(int index, int data) {
-    if(index < 0 || index >= size) {
-        throw InvalidIndex();
+        return false;
     }
-    
-    data[index] = data;
-}
 
+    return false;
+
+}
 
 

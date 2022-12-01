@@ -15,7 +15,20 @@ world_cup_t::~world_cup_t()
 
 StatusType world_cup_t::add_team(int teamId, int points)
 {
-	// TODO: Your code goes here
+    if(teamId <= 0 || points < 0)
+        return StatusType::INVALID_INPUT;
+
+    if(!teams.isExist(teamId)) {
+        return StatusType::FAILURE;
+    }
+
+    try {
+        teams.insert(teamId, new Team(teamId, points));
+    }
+    catch (const bad_alloc& badAlloc) {
+        return StatusType::ALLOCATION_ERROR;
+    }
+
 	return StatusType::SUCCESS;
 }
 
@@ -42,7 +55,27 @@ StatusType world_cup_t::remove_team(int teamId)
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 								   int goals, int cards, bool goalKeeper)
 {
-	// TODO: Your code goes here
+    if(playerId <= 0 || teamId <= 0 || gamesPlayed < 0 || goals < 0 || cards < 0)
+        return StatusType::INVALID_INPUT;
+    if(gamesPlayed == 0 && (cards > 0 || goals > 0))
+        return StatusType::INVALID_INPUT;
+    try {
+        if(playersByID.isExist(playerId))
+            return StatusType::FAILURE;
+        Team* checkTeam = teams.search(teamId);
+        Player* newPlayer = new Player(playerId, checkTeam, gamesPlayed, goals, cards, goalKeeper);
+        playersByID.insert(playerId, newPlayer);
+        playersByStats.insert(Tuple(goals, cards, playerId), newPlayer);
+
+        //TODO: add player to the team and all the closest stuff
+    }
+
+    catch(const KeyNotFound& keyNotFound) {
+        return StatusType::FAILURE;
+    }
+
+
+
 	return StatusType::SUCCESS;
 }
 
@@ -54,7 +87,7 @@ StatusType world_cup_t::remove_player(int playerId)
     
     try {
         Player* removedPlayer = playersByID.remove(playerId);
-        playersByStats.remove(playerId);
+        playersByStats.remove(removedPlayer->getStatsTuple());
         Player* lastClosest = playersByID.search(removedPlayer->getClosestId());
         Player* lastRefBy = playersByID.search(removedPlayer->getRefById());
         
@@ -159,17 +192,67 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
 
 output_t<int> world_cup_t::get_all_players_count(int teamId)
 {
-	// TODO: Your code goes here
-	static int i = 0;
-	return (i++ == 0) ? 11 : 2;
+    if(teamId < 0) {
+        output_t<int> playersOverall = output_t<int>(numPlayersOverall);
+        return playersOverall;
+    }
+
+    if(teamId > 0) {
+        try {
+            Team* checkTeam = teams.search(teamId);
+            output_t<int> playersInTeam = output_t<int>(checkTeam->getNumPlayers());
+            return playersInTeam;
+        }
+        catch (const KeyNotFound& k1) {
+            output_t<int> teamNotFound = output_t<int>(StatusType::FAILURE);
+            return teamNotFound;
+        }
+    }
+
+    output_t<int> invalidInput = output_t<int>(StatusType::INVALID_INPUT);
+    return invalidInput;
 }
 
 StatusType world_cup_t::get_all_players(int teamId, int *const output)
 {
-	// TODO: Your code goes here
-	output[0] = 4001;
-	output[1] = 4002;
-	return StatusType::SUCCESS;
+    if(output == nullptr) {
+        return StatusType::INVALID_INPUT;
+    }
+    if(teamId < 0) {
+        if(numPlayersOverall == 0) {
+            return StatusType::FAILURE;
+        }
+
+        Player** playersArray = new Player*[numPlayersOverall];
+        playersByStats.inorderDataToArray(playersArray);
+        for(int i = 0; i < numPlayersOverall; i++)
+            output[i] = playersArray[i]->getId();
+        delete[] playersArray;
+        return StatusType::SUCCESS;
+    }
+
+    if(teamId > 0) {
+        try {
+            Team* checkTeam = teams.search(teamId);
+            int numPlayersTeam = checkTeam->getNumPlayers();
+            if(numPlayersTeam == 0)
+                return StatusType::FAILURE;
+            Player** teamPlayersArray = new Player*[numPlayersTeam];
+
+            const AVLTree<Tuple, Player*>& teamPlayerTree = checkTeam->getStatsTree();
+            teamPlayerTree.inorderDataToArray(teamPlayersArray);
+
+            for(int i = 0; i < numPlayersTeam; i++)
+                output[i] = teamPlayersArray[i]->getId();
+            delete[] teamPlayersArray;
+            return StatusType::SUCCESS;
+        }
+        catch (const KeyNotFound& k1) {
+            return StatusType::FAILURE;
+        }
+    }
+
+	return StatusType::INVALID_INPUT;
 }
 
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)

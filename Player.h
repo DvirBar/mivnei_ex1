@@ -28,7 +28,7 @@ public:
     int getRefById() const;
     
     Tuple getStatsTuple();
-    
+
 private:
     int playerId;
     int gamesPlayed;
