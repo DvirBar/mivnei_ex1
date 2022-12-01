@@ -55,7 +55,27 @@ StatusType world_cup_t::remove_team(int teamId)
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 								   int goals, int cards, bool goalKeeper)
 {
-	// TODO: Your code goes here
+    if(playerId <= 0 || teamId <= 0 || gamesPlayed < 0 || goals < 0 || cards < 0)
+        return StatusType::INVALID_INPUT;
+    if(gamesPlayed == 0 && (cards > 0 || goals > 0))
+        return StatusType::INVALID_INPUT;
+    try {
+        if(playersByID.isExist(playerId))
+            return StatusType::FAILURE;
+        Team* checkTeam = teams.search(teamId);
+        Player* newPlayer = new Player(playerId, checkTeam, gamesPlayed, goals, cards, goalKeeper);
+        playersByID.insert(playerId, newPlayer);
+        playersByStats.insert(Tuple(goals, cards, playerId), newPlayer);
+
+        //TODO: add player to the team and all the closest stuff
+    }
+
+    catch(const KeyNotFound& keyNotFound) {
+        return StatusType::FAILURE;
+    }
+
+
+
 	return StatusType::SUCCESS;
 }
 

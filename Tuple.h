@@ -3,19 +3,22 @@
 
 class Tuple {
 public:
-    Tuple(int size);
-    Tuple(const Tuple& tuple);
-    Tuple& operator=(const Tuple& tuple);
-    ~Tuple();
+    Tuple(int primary, int secondary, int tertiary);
+    Tuple(const Tuple& tuple) = default;
+    Tuple& operator=(const Tuple& tuple) = default;
+    ~Tuple() = default;
+
     
-    void insertInIndex(int index, int data);
-    
-    class InvalidSize {};
-    class InvalidIndex {};
-    class TupleSizesDontMatch{};
+//    class InvalidSize {};
+//    class InvalidIndex {};
+//    class TupleSizesDontMatch{};
+
 private:
-    int size;
-    int* data;
+    int primaryValue;
+    int secondaryValue;
+    int tertiaryValue;
+
+    friend bool operator>(const Tuple& tuple1, const Tuple& tuple2);
 };
 
 #endif /* Tuple_h */
