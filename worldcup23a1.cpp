@@ -2,11 +2,16 @@
 #include "Team.h"
 #include "Player.h"
 #include "Exception.h"
+#include "LinkedList.h"
 
-world_cup_t::world_cup_t()
-{
-	// TODO: Your code goes here
-}
+world_cup_t::world_cup_t():
+teams(),
+playersByStats(),
+playersByID(),
+validKnockoutTeams(),
+topScorer(nullptr),
+numPlayersOverall(0)
+{}
 
 world_cup_t::~world_cup_t()
 {
@@ -62,20 +67,34 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
     try {
         if(playersByID.isExist(playerId))
             return StatusType::FAILURE;
+
         Team* checkTeam = teams.search(teamId);
         Player* newPlayer = new Player(playerId, checkTeam, gamesPlayed, goals, cards, goalKeeper);
-        playersByID.insert(playerId, newPlayer);
-        playersByStats.insert(Tuple(goals, cards, playerId), newPlayer);
 
-        //TODO: add player to the team and all the closest stuff
+        playersByID.insert(playerId, newPlayer);
+        playersByStats.insert(newPlayer->getStatsTuple(), newPlayer);
+        checkTeam->addPlayer(newPlayer);
+        numPlayersOverall++;
+
+        if(checkTeam->isValidTeam()) {
+            validKnockoutTeams.insert(teamId,checkTeam);
+            checkTeam->setNextValidRank(validKnockoutTeams.nextInorder(teamId));
+            checkTeam->setPrevValidRank(validKnockoutTeams.prevInorder(teamId));
+        }
+
+        newPlayer->updatePrevInRank(playersByStats.prevInorder(newPlayer->getStatsTuple()));
+        newPlayer->updateNextInRank(playersByStats.nextInorder(newPlayer->getStatsTuple()));
+
+        if(newPlayer->getStatsTuple() > topScorer->getStatsTuple()) {
+            topScorer = newPlayer;
+        }
+        if(newPlayer->getStatsTuple() > checkTeam->getTopScorer()->getStatsTuple())
+            checkTeam->setTopScorer(newPlayer);
     }
 
     catch(const KeyNotFound& keyNotFound) {
         return StatusType::FAILURE;
     }
-
-
-
 	return StatusType::SUCCESS;
 }
 
@@ -172,7 +191,7 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
             return noTeam;
         }
         else {
-            output_t<int> successTeam = checkTeam->get_top_scorer();
+            output_t<int> successTeam = checkTeam->getTopScorer()->getId();
             return successTeam;
         }
     }
@@ -183,7 +202,7 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
             return noPlayers;
         }
         else {
-            output_t<int> successPlayer = output_t<int>(topScorer);
+            output_t<int> successPlayer = output_t<int>(topScorer->getId());
             return successPlayer;
         }
     }
@@ -205,7 +224,7 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
             output_t<int> playersInTeam = output_t<int>(checkTeam->getNumPlayers());
             return playersInTeam;
         }
-        catch (const KeyNotFound& k1) {
+        catch (const KeyNotFound& keyNotFound) {
             output_t<int> teamNotFound = output_t<int>(StatusType::FAILURE);
             return teamNotFound;
         }
@@ -240,7 +259,7 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
             if(numPlayersTeam == 0)
                 return StatusType::FAILURE;
             Player** teamPlayersArray = new Player*[numPlayersTeam];
-
+            //TODO: make Team Method that does this, no need for team tree access.
             const AVLTree<Tuple, Player*>& teamPlayerTree = checkTeam->getStatsTree();
             teamPlayerTree.inorderDataToArray(teamPlayersArray);
 
@@ -249,7 +268,7 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
             delete[] teamPlayersArray;
             return StatusType::SUCCESS;
         }
-        catch (const KeyNotFound& k1) {
+        catch (const KeyNotFound& keyNotFound) {
             return StatusType::FAILURE;
         }
     }
@@ -265,6 +284,31 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
-	// TODO: Your code goes here
-	return 2;
+    if(minTeamId < 0 || maxTeamId < 0 || maxTeamId < minTeamId)
+        return StatusType::INVALID_INPUT;
+
+    Team* firstTeamInRange;
+
+    try{
+        firstTeamInRange = validKnockoutTeams.findFirstInRange(minTeamId);
+    }
+    catch (const KeyNotFound& keyNotFound) {
+        return StatusType::INVALID_INPUT;
+    }
+
+//    LinkedList<int, int>* teamList = new LinkedList<int,int>(0,0);
+//    Team* teamPointer = firstTeamInRange;
+//    while(teamPointer->getTeamId() <= maxTeamId) {
+//        try {
+//            teamList->insert(teamPointer->getTeamId(), teamPointer->getTotalStats());
+//        }
+//        catch (const bad_alloc& badAlloc) {
+//            return StatusType::ALLOCATION_ERROR;
+//        }
+//        teamPointer = teamPointer->getNextValidRank();
+//    }
+
+//    LinkedList<int,int>* currentNode = teamList->
+
+
 }

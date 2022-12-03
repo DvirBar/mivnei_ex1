@@ -26,8 +26,13 @@ public:
     void updateRefBy(int refById);
     int getClosestId() const;
     int getRefById() const;
+    int getGoals() const;
+    int getCards();
     void removeFromTeam();
-    Tuple getStatsTuple();
+    void updateNextInRank(Player* next);
+    void updatePrevInRank(Player* prev);
+    bool isGoalKeeper() const;
+    const Tuple getStatsTuple() const;
 
 private:
     int playerId;
@@ -38,6 +43,8 @@ private:
     Team* team;
     int closestPlayerId;
     int refById;
+    Player* nextRank;
+    Player* prevRank;
 };
 
 #endif // PLAYER_H_

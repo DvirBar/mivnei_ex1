@@ -7,6 +7,12 @@ secondaryValue(secondary),
 tertiaryValue(tertiary)
 {}
 
+Tuple::Tuple():
+primaryValue(0),
+secondaryValue(0),
+tertiaryValue(0)
+{}
+
 bool operator>(const Tuple& tuple1, const Tuple& tuple2) {
     if(tuple1.primaryValue > tuple2.primaryValue)
         return true;
@@ -25,4 +31,10 @@ bool operator>(const Tuple& tuple1, const Tuple& tuple2) {
 
 }
 
+bool operator==(const Tuple& tuple1, const Tuple& tuple2) {
+    return tuple1.primaryValue == tuple2.primaryValue && tuple1.secondaryValue == tuple2.secondaryValue && tuple1.tertiaryValue == tuple2.tertiaryValue;
+}
 
+bool operator<(const Tuple& tuple1, const Tuple& tuple2) {
+    return tuple2 > tuple1;
+}

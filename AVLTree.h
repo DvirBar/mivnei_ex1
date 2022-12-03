@@ -2,9 +2,9 @@
 #define AVLTREE_H_
 
 // TODO: We probably shouldn't use algorithm library
-#include <memory>
-#include <cmath>
-#include <algorithm>
+//#include <memory>
+//#include <cmath>
+//#include <algorithm>
 #include <stdio.h>
 #include <iostream>
 #include "Exception.h"
@@ -48,7 +48,8 @@ class AVLTree
     static int getNodeBalanceFactor(AVLNode* node);
     static int getNodeHeight(AVLNode* node);
     static void deleteTreeAux(AVLNode* node);
-    static void inorderToArrayAUX(const AVLNode* node, T* array);
+    static void inorderToArrayAux(const AVLNode* node, T* array);
+    static const T& firstInRangeAux(AVLNode* node, const K& range);
     
     
 public:
@@ -64,11 +65,13 @@ public:
     const T& nextInorder(const K& currentKey) const;
     const T& prevInorder(const K& currentKey) const;
     void inorderDataToArray(T* array) const;
+    const T& findFirstInRange(const K& range) const;
 //    int getNumNodes() const;
 //    int getHeight() const;
     bool isEmpty() const;
     void printTree() const;
     static void print2DUtil(AVLNode* node, int space);
+    static int maxValue(int value1, int value2);
 };
 
 
@@ -168,14 +171,11 @@ const typename AVLTree<K, T>::AVLNode* AVLTree<K, T>::searchByNode(const AVLTree
 
     if (node->key == key)
         return node;
-    
-    const AVLTree::AVLNode* nextNode = nullptr;
+
     if (node->key > key)
-        nextNode = searchByNode(node->leftChild, key);
+        return searchByNode(node->leftChild, key);
     else
-        nextNode = searchByNode(node->rightChild, key);
-    
-    return nextNode;
+        return searchByNode(node->rightChild, key);
 }
 
 template <class K, class T>
@@ -238,7 +238,7 @@ int AVLTree<T, K>::getNodeHeight(AVLTree::AVLNode *node) {
 
 template <class K, class T>
 void AVLTree<K, T>::AVLNode::updateHeight() {
-    height = max(getNodeHeight(leftChild), getNodeHeight(rightChild)) + 1;
+    height = maxValue(getNodeHeight(leftChild), getNodeHeight(rightChild)) + 1;
 }
 
 template <class K, class T>
@@ -454,18 +454,18 @@ void AVLTree<K, T>::printTree() const {
 }
 
 template<class K, class T>
-void AVLTree<K, T>::inorderToArrayAUX(const AVLNode* node, T* array) {
+void AVLTree<K, T>::inorderToArrayAux(const AVLNode* node, T* array) {
     if(node != nullptr) {
-        inorderToArrayAUX(node->leftChild, array);
+        inorderToArrayAux(node->leftChild, array);
         *array = node->data;
         array++;
-        inorderToArrayAUX(node->rightChild, array);
+        inorderToArrayAux(node->rightChild, array);
     }
 }
 
 template<class K, class T>
 void AVLTree<K, T>::inorderDataToArray(T* array) const {
-    inorderToArrayAUX(root, array);
+    inorderToArrayAux(root, array);
 }
 
 template<class K, class T>
@@ -477,6 +477,37 @@ bool AVLTree<K, T>::isExist(const K &key) const {
         return false;
     }
     return true;
+}
+
+template<class K, class T>
+const T& AVLTree<K, T>::firstInRangeAux(AVLNode *node, const K &range) {
+    if(node == nullptr)
+        throw KeyNotFound();
+
+    if(node->key < range)
+        return firstInRangeAux(node->rightChild, range);
+
+    if(node->key >= range && node->leftChild == nullptr)
+        return node->data;
+
+    if(node->key >= range && node->leftChild->key >= range)
+        return firstInRangeAux(node->leftChild, range);
+    else
+        return node->data;
+}
+
+template<class K, class T>
+const T& AVLTree<K, T>::findFirstInRange(const K& range) const {
+    return firstInRangeAux(root, range);
+}
+
+template<class K, class T>
+int AVLTree<K, T>::maxValue(int value1, int value2) {
+    if(value1 >= value2)
+        return value1;
+    else
+        return value2;
+//    return value1 >= value2 ? value1 : value2;
 }
 
 

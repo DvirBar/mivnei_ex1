@@ -25,21 +25,31 @@ public:
     Team(const Team &team);
     ~Team();
 
-    StatusType remove_team();
-    int get_top_scorer();
+//    StatusType remove_team();
     void addPoints(int pointsToAdd);
     void addGames(int numGamesToAdd);
+    void setCards(int cards);
+    void setGoals(int goals);
     int getNumPlayers () const;
     int getNumGoalKeepers() const;
     bool isValidTeam() const;
     int getTotalGoals() const;
     int getTotalCards() const;
     int getTotalPoints() const;
+    Team* getNextValidRank() const;
+    Team* getPrevValidRank() const;
+    int getTeamId() const;
     const AVLTree<Tuple, Player*>& getStatsTree() const;
-    StatusType get_all_players(int* const output);
-    void conclude_game(GameResult result);
-    static StatusType unite_teams(int teamId1, int teamId2, int newTeamId);
+    int getTotalStats() const;
+    //    StatusType get_all_players(int* const output);
+//    void conclude_game(GameResult result);
+//    static StatusType unite_teams(int teamId1, int teamId2, int newTeamId);
     void removePlayer(int playerId);
+    void addPlayer(Player* playerToInsert);
+    Player* getTopScorer() const;
+    void setTopScorer(Player* newTopScorer);
+    void setNextValidRank(Team* next);
+    void setPrevValidRank(Team* prev);
 
     class TeamNotFound: public exception{};
 private:
@@ -49,7 +59,9 @@ private:
     int totalGoals;
     int numPlayers;
     int numGoalkeepers;
-    int teamTopScorer;
+    Player* teamTopScorer;
+    Team* nextValidRank;
+    Team* prevValidRank;
     int totalGamesPlayed;
     AVLTree<int, Player*> teamPlayersByID;
     AVLTree<Tuple, Player*> teamPlayersByStats;

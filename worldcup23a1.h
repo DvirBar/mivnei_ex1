@@ -26,9 +26,10 @@ using namespace std;
 class world_cup_t {
 private:
 	AVLTree<int, Team*> teams;
-	AVLTree<int, Player*> playersByID;
+    AVLTree<int, Player*> playersByID;
     AVLTree<Tuple, Player*> playersByStats;
-    int topScorer;
+    AVLTree<int, Team*> validKnockoutTeams;
+    Player* topScorer;
     int numPlayersOverall;
     
     // Excecutes on insert and remove player to find closest in O(log(n))
