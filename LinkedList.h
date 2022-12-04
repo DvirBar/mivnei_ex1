@@ -1,9 +1,13 @@
-//
-// Created by 222ro on 02-Dec-22.
-//
-
 #ifndef MIVNEI_EX1_LINKEDLIST_H
 #define MIVNEI_EX1_LINKEDLIST_H
+
+//template<class K, class T>
+//struct LinkedNode {
+//    K key;
+//    T data;
+//    LinkedNode* nextNode;
+//    LinkedNode* prevNode;
+//};
 
 template<class K, class T>
 class LinkedList
@@ -21,7 +25,9 @@ public:
     ~LinkedList();
     void insert(const K& key, const T& data);
     void remove(const K& key);
-    LinkedList* getNextNode();
+    LinkedList* getNextNode() const;
+    const K& getKey() const;
+    const T& getData() const;
 
 
 
@@ -45,8 +51,18 @@ LinkedList<K, T>::LinkedList(const LinkedList& node) {
 }
 
 template<class K, class T>
- LinkedList<K, T>* LinkedList<K, T>::getNextNode() {
+ LinkedList<K, T>* LinkedList<K, T>::getNextNode() const {
     return nextNode;
+}
+
+template<class K, class T>
+const K& LinkedList<K, T>::getKey() const {
+    return key;
+}
+
+template<class K, class T>
+const T& LinkedList<K, T>::getData() const {
+    return data;
 }
 
 

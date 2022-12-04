@@ -20,6 +20,7 @@
 #include "Team.h"
 #include "Player.h"
 #include "Tuple.h"
+#include "Pair.h"
 
 using namespace std;
 
@@ -31,9 +32,9 @@ private:
     AVLTree<int, Team*> validKnockoutTeams;
     Player* topScorer;
     int numPlayersOverall;
-    
     // Excecutes on insert and remove player to find closest in O(log(n))
     Player* findPlayerClosest(Tuple statsTuple) const;
+    static Pair<int, int> compareKnockoutTeams(const Pair<int, int>& firstTeam, const Pair<int, int>& secondTeam);
     
 public:
 	// <DO-NOT-MODIFY> {

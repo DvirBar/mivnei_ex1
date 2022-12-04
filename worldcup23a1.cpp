@@ -2,7 +2,8 @@
 #include "Team.h"
 #include "Player.h"
 #include "Exception.h"
-#include "LinkedList.h"
+//#include "LinkedList.h"
+#include "Pair.h"
 
 world_cup_t::world_cup_t():
 teams(),
@@ -296,19 +297,103 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
         return StatusType::INVALID_INPUT;
     }
 
-//    LinkedList<int, int>* teamList = new LinkedList<int,int>(0,0);
-//    Team* teamPointer = firstTeamInRange;
-//    while(teamPointer->getTeamId() <= maxTeamId) {
-//        try {
-//            teamList->insert(teamPointer->getTeamId(), teamPointer->getTotalStats());
-//        }
-//        catch (const bad_alloc& badAlloc) {
-//            return StatusType::ALLOCATION_ERROR;
-//        }
-//        teamPointer = teamPointer->getNextValidRank();
-//    }
+    Team* currentTeam = firstTeamInRange;
+    int initialNumTeams = 0;
+    while(currentTeam != nullptr && currentTeam->getTeamId() < maxTeamId) {
+        initialNumTeams++;
+        currentTeam = currentTeam->getNextValidRank();
+    }
 
-//    LinkedList<int,int>* currentNode = teamList->
+    Pair<int,int>* initialTeamArray;
+    try {
+        initialTeamArray = new Pair<int, int>[initialNumTeams];
+    }
+    catch (const bad_alloc& badAlloc) {
+        return StatusType::ALLOCATION_ERROR;
+    }
+
+    currentTeam = firstTeamInRange;
+    for(int i = 0; i <  initialNumTeams; i++) {
+        initialTeamArray[i].setKey(currentTeam->getTeamId());
+        initialTeamArray[i].setValue(currentTeam->getTotalStats());
+        currentTeam = currentTeam->getNextValidRank();
+    }
+
+    Pair<int,int>* prevArray = initialTeamArray;
+    int currentTeamArraySize = initialNumTeams;
+    Pair<int, int>* knockoutArray;
+    while(currentTeamArraySize > 1) {
+
+        if(currentTeamArraySize % 2 == 0) {
+            currentTeamArraySize /= 2;
+
+            try {
+                knockoutArray = new Pair<int, int>[currentTeamArraySize];
+            }
+            catch (const bad_alloc& badAlloc) {
+                return StatusType::ALLOCATION_ERROR;
+            }
 
 
+            int arrayIndex = 0;
+            for(int i = 1; i < initialNumTeams; i += 2) {
+                knockoutArray[arrayIndex] = compareKnockoutTeams(prevArray[i], prevArray[i - 1]);
+                arrayIndex++;
+            }
+            delete[] prevArray;
+            prevArray = knockoutArray;
+            initialNumTeams = currentTeamArraySize;
+            continue;
+        }
+
+        if(currentTeamArraySize % 2 == 1) {
+            currentTeamArraySize = ((currentTeamArraySize - 1) / 2) + 1;
+
+            try {
+                knockoutArray = new Pair<int, int>[currentTeamArraySize];
+            }
+            catch (const bad_alloc& badAlloc) {
+                return StatusType::ALLOCATION_ERROR;
+            }
+
+            int arrayIndex = 0;
+            for(int i = 1; i < initialNumTeams; i += 2) {
+                knockoutArray[arrayIndex] = compareKnockoutTeams(prevArray[i], prevArray[i - 1]);
+                arrayIndex++;
+            }
+            knockoutArray[currentTeamArraySize - 1].setKey(prevArray[initialNumTeams - 1].getKey());
+            knockoutArray[currentTeamArraySize - 1].setValue(prevArray[initialNumTeams - 1].getValue());
+            delete[] prevArray;
+            prevArray = knockoutArray;
+            initialNumTeams = currentTeamArraySize;
+        }
+    }
+
+    int winID = prevArray[0].getKey();
+    delete[] prevArray;
+    return winID;
+}
+
+Pair<int, int> world_cup_t::compareKnockoutTeams(const Pair<int, int> &firstTeam, const Pair<int, int> &secondTeam) {
+    int newStats = firstTeam.getValue() + secondTeam.getValue() + 3;
+    if(firstTeam.getValue() > secondTeam.getValue()) {
+        Pair<int, int> newPair = Pair<int, int>(firstTeam.getKey(), newStats);
+        return newPair;
+    }
+
+    if(firstTeam.getValue() < secondTeam.getValue()) {
+        Pair<int, int> newPair = Pair<int, int>(secondTeam.getKey(), newStats);
+        return newPair;
+    }
+
+    if(firstTeam.getValue() == secondTeam.getValue()) {
+        if(firstTeam.getKey() > secondTeam.getKey()) {
+            Pair<int, int> newPair = Pair<int, int>(firstTeam.getKey(), newStats);
+            return newPair;
+        }
+        else {
+            Pair<int, int> newPair = Pair<int, int>(secondTeam.getKey(), newStats);
+            return newPair;
+        }
+    }
 }
