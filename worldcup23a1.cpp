@@ -29,7 +29,8 @@ StatusType world_cup_t::add_team(int teamId, int points)
     }
 
     try {
-        teams.insert(teamId, new Team(teamId, points));
+        Team* newTeam = new Team(teamId,points);
+        teams.insert(teamId, newTeam);
     }
     catch (const bad_alloc& badAlloc) {
         return StatusType::ALLOCATION_ERROR;
