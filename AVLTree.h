@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Pair.h"
 #include "Exception.h"
+#include <cassert>
 #define COUNT 10
 
 using namespace std;
@@ -474,7 +475,7 @@ template<class K, class T>
 void AVLTree<K, T>::inorderToArrayAUX(const AVLNode* node, Pair<K, T>* array) {
     if(node != nullptr) {
         inorderToArrayAUX(node->leftChild, array);
-        *array = Pair(node->key, node->data);
+        *array = Pair<K, T>(node->key, node->data);
         array++;
         inorderToArrayAUX(node->rightChild, array);
     }

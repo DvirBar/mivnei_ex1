@@ -85,26 +85,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 
         Team* checkTeam = teams.search(teamId);
         Player* newPlayer = new Player(playerId, checkTeam, gamesPlayed, goals, cards, goalKeeper);
-
-        bool wasValid = checkTeam->isValidTeam();
-        playersByID.insert(playerId, newPlayer);
-        playersByStats.insert(newPlayer->getStatsTuple(), newPlayer);
-        checkTeam->addPlayer(newPlayer);
-
-        if(!wasValid && checkTeam->isValidTeam()) {
-            validKnockoutTeams.insert(teamId,checkTeam);
-            checkTeam->setNextValidRank(validKnockoutTeams.nextInorder(teamId));
-            checkTeam->setPrevValidRank(validKnockoutTeams.prevInorder(teamId));
-        }
-
-        newPlayer->updatePrevInRank(playersByStats.prevInorder(newPlayer->getStatsTuple()));
-        newPlayer->updateNextInRank(playersByStats.nextInorder(newPlayer->getStatsTuple()));
-
-        if(newPlayer->getStatsTuple() > topScorer->getStatsTuple()) {
-            topScorer = newPlayer;
-        }
-        if(newPlayer->getStatsTuple() > checkTeam->getTopScorer()->getStatsTuple())
-            checkTeam->setTopScorer(newPlayer);
+        addPlayerAux(newPlayer, checkTeam);
     }
 
     catch(const KeyNotFound& keyNotFound) {
@@ -134,9 +115,28 @@ StatusType world_cup_t::remove_player(int playerId)
     }
 }
 
-void world_cup_t::addPlayerAux(int playerId, int teamId, int gamesPlayed,
-                                  int goals, int cards, bool goalKeeper) {
-    
+void world_cup_t::addPlayerAux(Player* player, Team* team) {
+
+
+    bool wasValid = team->isValidTeam();
+    playersByID.insert(player->getId(), player);
+    playersByStats.insert(player->getStatsTuple(), player);
+    team->addPlayer(player);
+
+    if(!wasValid && team->isValidTeam()) {
+        validKnockoutTeams.insert(team->getId(), team);
+        team->setNextValidRank(validKnockoutTeams.nextInorder(team->getId()));
+        team->setPrevValidRank(validKnockoutTeams.prevInorder(team->getId()));
+    }
+
+    player->updatePrevInRank(playersByStats.prevInorder(player->getStatsTuple()));
+    player->updateNextInRank(playersByStats.nextInorder(player->getStatsTuple()));
+
+    if(player->getStatsTuple() > topScorer->getStatsTuple()) {
+        topScorer = player;
+    }
+    if(player->getStatsTuple() > team->getTopScorer()->getStatsTuple())
+        team->setTopScorer(player);
 }
 
 Player* world_cup_t::removePlayerAux(int playerId) {
@@ -173,7 +173,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
         int newScoredGoals = player->getGoals() + scoredGoals;
         int newCards = player->getCards() + cardsReceived;
         
-        addPlayerAux(playerId, team->getId(), newGamesPlayed, newScoredGoals, newCards, isGoalKeeper);
+        addPlayerAux(player, team);
         
         return StatusType::SUCCESS;
     } catch(const KeyNotFound& error) {

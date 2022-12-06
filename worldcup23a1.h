@@ -32,8 +32,7 @@ private:
     Player* topScorer;
     int numPlayersOverall;
     
-    void addPlayerAux(int playerId, int teamId, int gamesPlayed,
-                         int goals, int cards, bool goalKeeper);
+    void addPlayerAux(Player* player, Team* team);
     Player* removePlayerAux(int playerId);
     Player* findPlayerClosest(int playerId, int teamId) const;
     static Player* closestAux(int playerVal,  Player* prev, int prevVal,
