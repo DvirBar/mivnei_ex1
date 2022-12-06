@@ -4,18 +4,18 @@
 #include "Pair.h"
 
 Team::Team(int teamId, int points) :
-teamId(teamId),
-totalPoints(points),
-totalCards(0),
-totalGoals(0),
-numPlayers(0),
-numGoalkeepers(0),
-teamTopScorer(nullptr),
-nextValidRank(nullptr),
-prevValidRank(nullptr),
-totalGamesPlayed(0),
-teamPlayersByID(),
-teamPlayersByStats()
+    teamId(teamId),
+    totalPoints(points),
+    totalCards(0),
+    totalGoals(0),
+    numPlayers(0),
+    numGoalkeepers(0),
+    teamTopScorer(nullptr),
+    nextValidRank(nullptr),
+    prevValidRank(nullptr),
+    totalGamesPlayed(0),
+    teamPlayersByID(),
+    teamPlayersByStats()
 {}
 
 int Team::getNumPlayers() const {
@@ -34,8 +34,12 @@ void Team::addPoints(int pointsToAdd) {
     totalPoints += pointsToAdd;
 }
 
-void Team::addGames(int numGamesToAdd) {
-    totalGamesPlayed += numGamesToAdd;
+void Team::addGame() {
+    totalGamesPlayed++;
+}
+
+void Team::setGoalGoalKeepers(int numGoalkeeper) {
+    this->numGoalkeepers = numGoalkeeper;
 }
 
 void Team::setCards(int cards) {
@@ -67,11 +71,29 @@ const AVLTree<Tuple, Player *>& Team::getStatsTree() const {
 }
 
 Team* Team::unite_teams(Team* team1, Team* team2, int newTeamId) {
+    Team* newTeam = new Team(newTeamId, team1->getTotalPoints() + team2->getTotalPoints());
+    
+    // TODO: update stats
+    newTeam->setCards(team1->getTotalCards()+team2->getTotalCards());
+    newTeam->setGoals(team1->getTotalGoals()+team2->getTotalGoals());
+    newTeam->addPoints(team1->getTotalPoints()+team2->getTotalPoints());
+    newTeam->setGoalGoalKeepers(team1->getNumGoalKeepers()+team2->getNumGoalKeepers());
+    if(team1->getTopScorer()->getStatsTuple() > team2->getTopScorer()->getStatsTuple()) {
+        newTeam->setTopScorer(team1->getTopScorer());
+    }
+    
+    else {
+        newTeam->setTopScorer(team2->getTopScorer());
+    }
+    
     int team1Size = team1->getNumPlayers();
     int team2Size = team2->getNumPlayers();
     int newArrSize = team1Size + team2Size;
-    Team* newTeam = new Team(newTeamId, newArrSize);
     
+    if(newArrSize == 0) {
+        return newTeam;
+    }
+        
     Pair<Tuple, Player*>* newStatsArr = new Pair<Tuple, Player*>[newArrSize];
     Pair<Tuple, Player*>* statsArr1 = new Pair<Tuple, Player*>[team1->getNumPlayers()];
     Pair<Tuple, Player*>* statsArr2 = new Pair<Tuple, Player*>[team2->getNumPlayers()];
@@ -86,6 +108,11 @@ Team* Team::unite_teams(Team* team1, Team* team2, int newTeamId) {
     
     AVLTree<Tuple, Player*>::mergeArrays(newStatsArr, newArrSize, statsArr1, team1Size, statsArr2, team2Size);
     AVLTree<int, Player*>::mergeArrays(newIdsArr, newArrSize, idsArr1, team1Size, idsArr2, team2Size);
+    
+    for(int i=0; i<newArrSize; i++) {
+        Player* curPlayer = newIdsArr[i].getValue();
+        curPlayer->setGamesPlayed(curPlayer->getNumPlayedGames());
+    }
     
     newTeam->fillStatsFromArray(newStatsArr, newArrSize);
     newTeam->fillIdsFromArray(newIdsArr, newArrSize);
@@ -127,8 +154,6 @@ void Team::removePlayer(int playerId) {
     int playerCards = playerToRemove->getCards();
     setGoals(-playerGoals);
     setCards(-playerCards);
-
-    numPlayers--;
 
     if(playerToRemove->isGoalKeeper())
         numGoalkeepers--;
@@ -177,6 +202,7 @@ int Team::getTotalStats() const {
 }
 
 void Team::updateTopScorer(Player *player) {
-    if(teamTopScorer == nullptr || teamTopScorer->getStatsTuple() < player->getStatsTuple())
+    if(teamTopScorer == nullptr ||
+       teamTopScorer->getStatsTuple() < player->getStatsTuple())
         teamTopScorer = player;
 }

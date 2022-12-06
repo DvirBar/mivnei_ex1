@@ -31,6 +31,10 @@ public:
     void updatePrevRank(Player* prev);
     int getGoals() const;
     int getCards() const;
+    void setGoals(int goals);
+    void setCards(int cards);
+    void setIsGoalKeeper(bool isGoalKeeper);
+    void setGamesPlayed(int gamesPlayed);
     void removeFromTeam();
     void updateNextInRank(Player* next);
     void updatePrevInRank(Player* prev);

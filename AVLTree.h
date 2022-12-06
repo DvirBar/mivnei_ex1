@@ -587,6 +587,7 @@ void AVLTree<K, T>::buildNearlyComplete(int size) {
     
     root = new AVLNode();
     buildNearlyCompleteAux(root, height-1);
+    removeLeavesAux(root, size);
 }
 
 template<class K, class T>

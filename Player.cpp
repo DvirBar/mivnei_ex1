@@ -57,4 +57,20 @@ bool Player::isGoalKeeper() const {
     return goalKeeper;
 }
 
+void Player::setGoals(int goals) {
+    this->goals = goals;
+}
+
+void Player::setCards(int cards) {
+    this->cards = cards;
+}
+
+void Player::setIsGoalKeeper(bool isGoalKeeper) {
+    this->goalKeeper = isGoalKeeper;
+}
+
+void Player::setGamesPlayed(int gamesPlayed) {
+    this->gamesPlayed = gamesPlayed-team->getTotalGamesPlayed();
+}
+
 

@@ -40,6 +40,10 @@ private:
                               Player* next, int nextVal);
     AVLTree<int, Team*> validKnockoutTeams;
     static Pair<int, int> compareKnockoutTeams(const Pair<int, int>& firstTeam, const Pair<int, int>& secondTeam);
+    void removeValidTeam(Team* team);
+    void addValidTeam(Team* team);
+    static const int WINNER_PTS = 3;
+    static const int TIE_PTS = 1;
 public:
 	// <DO-NOT-MODIFY> {
 

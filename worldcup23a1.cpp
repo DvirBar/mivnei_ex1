@@ -28,6 +28,9 @@ world_cup_t::~world_cup_t() {
     for(int i=0; i<playersByID.getNumNodes(); i++) {
         delete playersArray[i].getValue();
     }
+    
+    delete[] teamsArray;
+    delete[] playersArray;
 }
 
 StatusType world_cup_t::add_team(int teamId, int points)
@@ -61,6 +64,7 @@ StatusType world_cup_t::remove_team(int teamId)
             return StatusType::FAILURE;
         }
         teams.remove(teamId);
+        delete team;
     } catch(const KeyNotFound& error) {
         return StatusType::FAILURE;
     } catch(const bad_alloc& error) {
@@ -112,7 +116,8 @@ StatusType world_cup_t::remove_player(int playerId)
     }
     
     try {
-        removePlayerAux(playerId);
+        Player* player = removePlayerAux(playerId);
+        delete player;
         return StatusType::SUCCESS;
     } catch(const KeyNotFound& error) {
         return StatusType::INVALID_INPUT;
@@ -121,18 +126,20 @@ StatusType world_cup_t::remove_player(int playerId)
     }
 }
 
+void world_cup_t::addValidTeam(Team* team) {
+    validKnockoutTeams.insert(team->getId(), team);
+    team->setNextValidRank(validKnockoutTeams.nextInorder(team->getId()));
+    team->setPrevValidRank(validKnockoutTeams.prevInorder(team->getId()));
+}
+
 void world_cup_t::addPlayerAux(Player* player, Team* team) {
-
-
     bool wasValid = team->isValidTeam();
     playersByID.insert(player->getId(), player);
     playersByStats.insert(player->getStatsTuple(), player);
     team->addPlayer(player);
 
     if(!wasValid && team->isValidTeam()) {
-        validKnockoutTeams.insert(team->getId(), team);
-        team->setNextValidRank(validKnockoutTeams.nextInorder(team->getId()));
-        team->setPrevValidRank(validKnockoutTeams.prevInorder(team->getId()));
+        addValidTeam(team);
     }
 
     player->updatePrevInRank(playersByStats.prevInorder(player->getStatsTuple()));
@@ -142,19 +149,37 @@ void world_cup_t::addPlayerAux(Player* player, Team* team) {
     team->updateTopScorer(player);
 }
 
+void world_cup_t::removeValidTeam(Team* team) {
+    Team* prev = team->getPrevValidRank();
+    Team* next = team->getNextValidRank();
+    validKnockoutTeams.remove(team->getId());
+    prev->setNextValidRank(next);
+    next->setPrevValidRank(prev);
+}
+
 Player* world_cup_t::removePlayerAux(int playerId) {
     Player* removedPlayer = playersByID.remove(playerId);
     playersByStats.remove(removedPlayer->getStatsTuple());
     Player* rankNext = removedPlayer->getRankNext();
-    Player* rankPrev= removedPlayer->getRankNext();
+    Player* rankPrev = removedPlayer->getRankPrev();
     
     rankNext->updatePrevRank(rankPrev);
     rankPrev->updateNextRank(rankNext);
 
+    Team* team = removedPlayer->getTeam();
+    bool wasValid = team->isValidTeam();
     removedPlayer->removeFromTeam();
+
+    if(wasValid && !team->isValidTeam()) {
+        removeValidTeam(team);
+    }
     
     if(topScorer->getId() == removedPlayer->getId()) {
         topScorer = removedPlayer->getRankPrev();
+    }
+    
+    if(team->getTopScorer()->getId() == removedPlayer->getId()) {
+        team->setTopScorer(removedPlayer->getRankPrev());
     }
     
     return removedPlayer;
@@ -170,11 +195,10 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
     try {
         Player* player = removePlayerAux(playerId);
         
-        bool isGoalKeeper = player->isGoalKeeper();
         Team* team = player->getTeam();
-        int newGamesPlayed = player->getNumPlayedGames() + team->getTotalGamesPlayed() + gamesPlayed;
-        int newScoredGoals = player->getGoals() + scoredGoals;
-        int newCards = player->getCards() + cardsReceived;
+        player->setGoals(player->getGoals() + scoredGoals);
+        player->setGamesPlayed(player->getNumPlayedGames() + gamesPlayed);
+        player->setCards(player->getCards() + cardsReceived);
         
         addPlayerAux(player, team);
         
@@ -192,33 +216,40 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
         return StatusType::INVALID_INPUT;
     }
 
-    Team* checkTeam1 = teams.search(teamId1);
-    Team* checkTeam2 = teams.search(teamId2);
+    try {
+        Team* checkTeam1 = teams.search(teamId1);
+        Team* checkTeam2 = teams.search(teamId2);
 
-    if((checkTeam1 == nullptr) || (checkTeam2 == nullptr))
+        if((!checkTeam1->isValidTeam()) || (!checkTeam2->isValidTeam()))
+            return StatusType::FAILURE;
+
+        int totalScoreTeam1 = checkTeam1->getTotalStats();
+        int totalScoreTeam2 = checkTeam2->getTotalStats();
+
+        if(totalScoreTeam1 > totalScoreTeam2) {
+            checkTeam1->addPoints(WINNER_PTS);
+        }
+        else if(totalScoreTeam1 < totalScoreTeam2) {
+            checkTeam2->addPoints(WINNER_PTS);
+        }
+        else {
+            checkTeam1->addPoints(TIE_PTS);
+            checkTeam2->addPoints(TIE_PTS);
+        }
+
+        checkTeam1->addGame();
+        checkTeam2->addGame();
+        return StatusType::SUCCESS;
+    }
+    
+    catch(const KeyNotFound& error) {
         return StatusType::FAILURE;
-
-    if((!checkTeam1->isValidTeam()) || (!checkTeam2->isValidTeam()))
-        return StatusType::FAILURE;
-
-    int totalScoreTeam1 = checkTeam1->getTotalPoints() + checkTeam1->getTotalGoals() - checkTeam1->getTotalCards();
-    int totalScoreTeam2 = checkTeam2->getTotalPoints() + checkTeam2->getTotalGoals() - checkTeam2->getTotalCards();
-
-    if(totalScoreTeam1 > totalScoreTeam2) {
-        checkTeam1->addPoints(3);
     }
-    else if(totalScoreTeam1 < totalScoreTeam2) {
-        checkTeam2->addPoints(3);
+    
+    catch(const bad_alloc& error) {
+        return StatusType::ALLOCATION_ERROR;
     }
-    else {
-        checkTeam1->addPoints(1);
-        checkTeam2->addPoints(1);
-    }
-
-    checkTeam1->addGames(1);
-    checkTeam2->addGames(1);
-
-	return StatusType::SUCCESS;
+    
 }
 
 output_t<int> world_cup_t::get_num_played_games(int playerId)
@@ -262,11 +293,25 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     try {
         Team* team1 = teams.search(teamId1);
         Team* team2 = teams.search(teamId2);
-        if(teams.isExist(newTeamId)) {
+        if(teamId1 != newTeamId && teamId2 != newTeamId && teams.isExist(newTeamId)) {
             return StatusType::FAILURE;
         }
         
-        Team::unite_teams(team1, team2, newTeamId);
+        Team* newTeam = Team::unite_teams(team1, team2, newTeamId);
+        teams.remove(teamId1);
+        if(team1->isValidTeam()) {
+            removeValidTeam(team1);
+        }
+        
+        teams.remove(teamId2);
+        if(team2->isValidTeam()) {
+            removeValidTeam(team2);
+        }
+        
+        teams.insert(newTeamId, newTeam);
+        if(newTeam->isValidTeam()) {
+            addValidTeam(newTeam);
+        }
         
         return StatusType::SUCCESS;
     } catch (const KeyNotFound& error) {
@@ -278,37 +323,43 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 
 output_t<int> world_cup_t::get_top_scorer(int teamId)
 {
-    if(teamId > 0) {
-        Team* checkTeam = teams.search(teamId);
-        if(checkTeam == nullptr) {
-            output_t<int> noTeam = output_t<int>(StatusType::FAILURE);
-            return noTeam;
-        }
-        else {
+    if(teamId == 0) {
+        return output_t<int>(StatusType::INVALID_INPUT);
+    }
+    try {
+        if(teamId > 0) {
+            Team* checkTeam = teams.search(teamId);
+            if(checkTeam->getNumPlayers() == 0) {
+                return output_t<int>(StatusType::FAILURE);
+            }
+            
             output_t<int> successTeam = checkTeam->getTopScorer()->getId();
             return successTeam;
         }
-    }
 
-    if(teamId < 0) {
         if(playersByID.isEmpty()) {
             output_t<int> noPlayers = output_t<int>(StatusType::FAILURE);
             return noPlayers;
         }
-        else {
-            output_t<int> successPlayer = output_t<int>(topScorer->getId());
-            return successPlayer;
-        }
+    
+        output_t<int> successPlayer = output_t<int>(topScorer->getId());
+        return successPlayer;
     }
     
-    output_t<int> invalidInput = output_t<int>(StatusType::INVALID_INPUT);
-    return invalidInput;
+    catch(const KeyNotFound& error) {
+        return output_t<int>(StatusType::INVALID_INPUT);
+    }
+    
+    catch(const bad_alloc& error) {
+        return output_t<int>(StatusType::ALLOCATION_ERROR);
+    }
+  
 }
 
 output_t<int> world_cup_t::get_all_players_count(int teamId)
 {
     if(teamId < 0) {
-        output_t<int> playersOverall = output_t<int>(numPlayersOverall);
+        output_t<int> playersOverall = output_t<int>(playersByID.getNumNodes());
         return playersOverall;
     }
 
@@ -334,14 +385,17 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
         return StatusType::INVALID_INPUT;
     }
     if(teamId < 0) {
-        if(numPlayersOverall == 0) {
+        int numPlayers = playersByID.getNumNodes();
+        if(numPlayers == 0) {
             return StatusType::FAILURE;
         }
 
-        Pair<Tuple, Player*>* playersArray = new Pair<Tuple, Player*>[numPlayersOverall];
+        Pair<Tuple, Player*>* playersArray = new Pair<Tuple, Player*>[numPlayers];
         playersByStats.inorderDataToArray(playersArray);
-        for(int i = 0; i < numPlayersOverall; i++)
+        for(int i = 0; i < numPlayers; i++) {
             output[i] = playersArray[i].getValue()->getId();
+        }
+        
         delete[] playersArray;
         return StatusType::SUCCESS;
     }
@@ -355,8 +409,10 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
             Pair<Tuple, Player*>* teamPlayersArray = new Pair<Tuple, Player*>[numPlayersTeam];
     
             checkTeam->createStatsArray(teamPlayersArray);
-            for(int i = 0; i < numPlayersTeam; i++)
+            for(int i = 0; i < numPlayersTeam; i++) {
                 output[i] = teamPlayersArray[i].getValue()->getId();
+            }
+                
             delete[] teamPlayersArray;
             return StatusType::SUCCESS;
         }
@@ -415,7 +471,7 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId) {
         return output_t<int>(StatusType::INVALID_INPUT);
     }
     
-    if(numPlayersOverall <= 1) {
+    if(playersByID.getNumNodes() <= 1) {
         return output_t<int>(StatusType::FAILURE);
     }
     
@@ -433,7 +489,7 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId) {
     }
 }
 
-Player* closestAux(int playerVal,  Player* prev, int prevVal, Player* next,
+Player* closestAux(int playerVal, Player* prev, int prevVal, Player* next,
                    int nextVal) {
     if(abs(playerVal-prevVal) < abs(playerVal-nextVal)) {
         return prev;
@@ -452,7 +508,6 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
         return StatusType::INVALID_INPUT;
 
     Team* firstTeamInRange;
-
     try {
         firstTeamInRange = validKnockoutTeams.findFirstInRange(minTeamId);
         Team *currentTeam = firstTeamInRange;
@@ -539,14 +594,11 @@ Pair<int, int> world_cup_t::compareKnockoutTeams(const Pair<int, int> &firstTeam
         return newPair;
     }
 
-    if(firstTeam.getValue() == secondTeam.getValue()) {
-        if(firstTeam.getKey() > secondTeam.getKey()) {
-            Pair<int, int> newPair = Pair<int, int>(firstTeam.getKey(), newStats);
-            return newPair;
-        }
-        else {
-            Pair<int, int> newPair = Pair<int, int>(secondTeam.getKey(), newStats);
-            return newPair;
-        }
+    if(firstTeam.getKey() > secondTeam.getKey()) {
+        Pair<int, int> newPair = Pair<int, int>(firstTeam.getKey(), newStats);
+        return newPair;
     }
+    
+    Pair<int, int> newPair = Pair<int, int>(secondTeam.getKey(), newStats);
+    return newPair;
 }

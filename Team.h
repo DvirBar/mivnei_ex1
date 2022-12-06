@@ -19,7 +19,7 @@ public:
     ~Team();
 
     void addPoints(int pointsToAdd);
-    void addGames(int numGamesToAdd);
+    void addGame();
     void setCards(int cards);
     void setGoals(int goals);
     int getNumPlayers() const;
@@ -52,7 +52,8 @@ public:
     void setTopScorer(Player* newTopScorer);
     void setNextValidRank(Team* next);
     void setPrevValidRank(Team* prev);
-
+    void setGamesPlayed(int games);
+    void setGoalGoalKeepers(int numGoalkeeper);
     Player* findPlayerById(int playerId);
     static Team* unite_teams(Team* team1, Team* team2, int newTeamId);
     // TODO: implement
