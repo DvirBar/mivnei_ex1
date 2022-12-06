@@ -28,12 +28,19 @@ private:
 	AVLTree<int, Team*> teams;
 	AVLTree<int, Player*> playersByID;
     AVLTree<Tuple, Player*> playersByStats;
-    int topScorer;
+    Player* topScorer;
     int numPlayersOverall;
     
+    void addPlayerAux(int playerId, int teamId, int gamesPlayed,
+                         int goals, int cards, bool goalKeeper);
+    Player* removePlayerAux(int playerId);
     // Excecutes on insert and remove player to find closest in O(log(n))
-    Player* findPlayerClosest(Tuple statsTuple) const;
-    
+    Player* findPlayerClosest(int playerId, int teamId) const;
+    static Player* closestAux(int playerVal,  Player* prev, int prevVal,
+                              Player* next, int nextVal);
+    static const int EQUAL = 0;
+    static const int PREV = 1;
+    static const int NEXT = 2;
 public:
 	// <DO-NOT-MODIFY> {
 

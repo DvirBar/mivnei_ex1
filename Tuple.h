@@ -3,6 +3,7 @@
 
 class Tuple {
 public:
+    Tuple();
     Tuple(int primary, int secondary, int tertiary);
     Tuple(const Tuple& tuple) = default;
     Tuple& operator=(const Tuple& tuple) = default;

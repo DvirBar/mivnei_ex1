@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include <iostream>
+#include "Pair.h"
 #include "Exception.h"
 #define COUNT 10
 
@@ -23,7 +24,8 @@ class AVLTree
         AVLNode *rightChild;
         AVLNode *leftChild;
         int height;
-
+        
+        AVLNode();
         AVLNode(const K& key, const T& data);
 
         AVLNode(const AVLNode &) = default;
@@ -31,6 +33,7 @@ class AVLTree
 
 //        int getNodeBalanceFactor() const;
         void updateHeight();
+        bool isLeaf();
 
         AVLNode* RRrotation();
         AVLNode* LLrotation();
@@ -40,16 +43,19 @@ class AVLTree
     };
     
     AVLNode* root;
-//    int numNodes;
+    int numNodes;
     void execRemove(AVLNode* node, AVLNode* parent);
     static const AVLNode* searchByNode(const AVLNode* node, const K& key);
     AVLNode* insertByNode(AVLNode* node, const K& key, const T& data);
     T removeAux(const K& key, AVLNode* node, AVLNode* parent);
+    void buildNearlyComplete(int size);
+    void removeLeavesAux(AVLNode* node, int size);
+    static void buildNearlyCompleteAux(AVLNode* node, int height);
     static int getNodeBalanceFactor(AVLNode* node);
     static int getNodeHeight(AVLNode* node);
     static void deleteTreeAux(AVLNode* node);
-    static void inorderToArrayAUX(const AVLNode* node, T* array);
-    
+    static void inorderToArrayAUX(const AVLNode* node, Pair<K,T>* array);
+    static void populateFromArrayAux(AVLNode* node, Pair<K, T>* array);
     
 public:
     AVLTree();
@@ -63,19 +69,24 @@ public:
     const T& search(const K& key) const;
     const T& nextInorder(const K& currentKey) const;
     const T& prevInorder(const K& currentKey) const;
-    void inorderDataToArray(T* array) const;
-//    int getNumNodes() const;
+    void inorderDataToArray(Pair<K,T>* array) const;
+    void uniteTrees(const AVLTree& tree);
+    int getNumNodes() const;
 //    int getHeight() const;
     bool isEmpty() const;
     void printTree() const;
+    
+    // TODO: implement
+    void populateFromArray(Pair<K, T>* array, int size);
+    static void mergeArrays(Pair<K, T>* newArr, int newArrSize, Pair<K, T>* arr1,
+                            int arr1Size, Pair<K, T>* arr2, int arr2Size);
     static void print2DUtil(AVLNode* node, int space);
 };
 
-
 template <class K, class T>
 AVLTree<K, T>::AVLTree():
-    root(nullptr)
-//    numNodes(0)
+    root(nullptr),
+    numNodes(0)
 {}
 
 template <class K, class T>
@@ -108,6 +119,13 @@ template<class K, class T>
 AVLTree<K, T>::AVLNode::AVLNode(const K& key, const T& data):
     key(key),
     data(data),
+    height(0),
+    leftChild(nullptr),
+    rightChild(nullptr)
+{}
+
+template<class K, class T>
+AVLTree<K, T>::AVLNode::AVLNode():
     height(0),
     leftChild(nullptr),
     rightChild(nullptr)
@@ -225,7 +243,7 @@ template <class K, class T>
 typename AVLTree<K, T>::AVLNode *AVLTree<K, T>::insert(const K &key, const T &data)
 {
     root = insertByNode(root, key, data);
-//    numNodes++;
+    numNodes++;
     return root;
 };
 
@@ -257,7 +275,7 @@ T AVLTree<K, T>::remove(const K &key) {
     }
     
     T data = removeAux(key, root, nullptr);
-//    numNodes--;
+    numNodes--;
     return data;
 }
 
@@ -431,6 +449,11 @@ const T& AVLTree<K, T>::prevInorder(const K& currentKey) const {
 }
 
 template<class K, class T>
+void AVLTree<K, T>::uniteTrees(const AVLTree<K, T>& tree) {
+    
+}
+
+template<class K, class T>
 void AVLTree<K, T>::print2DUtil(AVLNode* root, int space) {
     if (root == nullptr) {
 //        cout << "Empty tree" <<  endl;
@@ -454,17 +477,17 @@ void AVLTree<K, T>::printTree() const {
 }
 
 template<class K, class T>
-void AVLTree<K, T>::inorderToArrayAUX(const AVLNode* node, T* array) {
+void AVLTree<K, T>::inorderToArrayAUX(const AVLNode* node, Pair<K, T>* array) {
     if(node != nullptr) {
         inorderToArrayAUX(node->leftChild, array);
-        *array = node->data;
+        *array = new Pair(node->key, node->data);
         array++;
         inorderToArrayAUX(node->rightChild, array);
     }
 }
 
 template<class K, class T>
-void AVLTree<K, T>::inorderDataToArray(T* array) const {
+void AVLTree<K, T>::inorderDataToArray(Pair<K,T>* array) const {
     inorderToArrayAUX(root, array);
 }
 
@@ -479,5 +502,97 @@ bool AVLTree<K, T>::isExist(const K &key) const {
     return true;
 }
 
+template<class K, class T>
+void AVLTree<K, T>::mergeArrays(Pair<K, T>* newArr, int newArrSize, Pair<K, T>* arr1,
+                                int arr1Size, Pair<K, T>* arr2, int arr2Size) {
+    int newArrIndex = 0, arr1Index = 0, arr2Index = 0;
+    
+    while(arr1Index < arr1Size &&
+          arr2Index < arr2Size &&
+          newArrIndex < newArrSize) {
+        if(arr1[arr1Index].getKey() < arr2[arr2Index].getKey()) {
+            newArr[newArrIndex] = arr1[arr1Index];
+            arr1Index++;
+        } else {
+            newArr[newArrIndex] = arr2[arr2Index];
+            arr2Index++;
+        }
+        
+        newArrIndex++;
+    }
+    
+    while(arr1Index < arr1Size) {
+        newArr[newArrIndex] = arr1[arr1Index];
+        arr1Index++;
+        newArrIndex++;
+    }
+    
+    while(arr2Index < arr2Size) {
+        newArr[newArrIndex] = arr2[arr2Index];
+        arr2Index++;
+        newArrIndex++;
+    }
+}
 
+template<class K, class T>
+void AVLTree<K, T>::populateFromArray(Pair<K, T>* array, int size) {
+    buildNearlyComplete(size);
+    populateFromArrayAux(root, array);
+}
+
+template<class K, class T>
+void AVLTree<K, T>::populateFromArrayAux(AVLNode* node, Pair<K, T>* array) {
+    if(node != nullptr) {
+        populateFromArrayAux(node->leftChild, array);
+        node->key = array->getKey();
+        node->data = array->getValue();
+        array++;
+        populateFromArrayAux(node->rightChild, array);
+    }
+}
+
+template<class K, class T>
+void AVLTree<K, T>::buildNearlyComplete(int size) {
+    assert(this->isEmpty());
+    int height = 1;
+    for(int i=1; i<size; i*=2) {
+        height++;
+    }
+    
+    root = new AVLNode();
+    buildNearlyCompleteAux(root, height-1);
+}
+
+template<class K, class T>
+void AVLTree<K, T>::removeLeavesAux(AVLNode* node, int size) {
+    if(node->isLeaf()) {
+        delete node;
+        numNodes--;
+        return;
+    }
+    
+    if(size == numNodes) {
+        return;
+    }
+    
+    removeLeavesAux(node->rightChild, size);
+    removeLeavesAux(node->leftChild, size);
+}
+
+template<class K, class T>
+void AVLTree<K, T>::buildNearlyCompleteAux(AVLNode* node, int height) {
+    if(height == 0) {
+        return;
+    }
+    
+    node->leftChild = new AVLNode();
+    buildNearlyCompleteAux(node->leftChild, height-1);
+    node->rightChild = new AVLNode();
+    buildNearlyCompleteAux(node->rightChild, height-1);
+}
+
+template<class K, class T>
+bool AVLTree<K, T>::AVLNode::isLeaf() {
+    return this->leftChild == nullptr && this->rightChild == nullptr;
+}
 #endif // AVLTREE_H_

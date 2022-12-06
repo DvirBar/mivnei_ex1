@@ -35,12 +35,28 @@ public:
     int getTotalGoals() const;
     int getTotalCards() const;
     int getTotalPoints() const;
+    int getTotalGamesPlayed() const;
+    // TODO: implement
+    int getId() const;
     const AVLTree<Tuple, Player*>& getStatsTree() const;
     StatusType get_all_players(int* const output);
     void conclude_game(GameResult result);
-    static StatusType unite_teams(int teamId1, int teamId2, int newTeamId);
-    void removePlayer(int playerId);
+    void addPlayer(Player* player);
+    void removePlayer(Player* player);
+    
+    void createStatsArray(Pair<Tuple, Player*>* arr);
+    void createIdsArray(Pair<int, Player*>* arr);
+    
+    // TODO: implement
+    void fillStatsFromArray(Pair<Tuple, Player*>* arr, int size);
+    void fillIdsFromArray(Pair<int, Player*>* arr, int size);
 
+    Player* findPlayerById(int playerId);
+    static Team* unite_teams(Team* team1, Team* team2, int newTeamId);
+    // TODO: implement
+    static void mergeArrays(Player** newArr, int newArrSize, Player** arr1,
+                            int arr1Size, Player** arr2, int arr2Size);
+    
     class TeamNotFound: public exception{};
 private:
     int teamId;
@@ -53,6 +69,9 @@ private:
     int totalGamesPlayed;
     AVLTree<int, Player*> teamPlayersByID;
     AVLTree<Tuple, Player*> teamPlayersByStats;
+    
+    // TODO: implement
+    void clearTeam();
 };
 
 #endif // TEAM_H_

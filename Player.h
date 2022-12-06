@@ -17,15 +17,20 @@ public:
     // playerId should be unique, so maybe we shouldn't allow copy?
     Player(const Player &player) = delete;
     ~Player() = default;
-    StatusType remove();
     StatusType update_stats(int gamesPlayed, int scoredGoals,
                             int cardsReceived);
-    output_t<int> get_num_played_games();
     int getId() const;
-    void updateClosest(Player* closest);
-    void updateRefBy(int refById);
-    int getClosestId() const;
-    int getRefById() const;
+    // TODO: implement
+    int getNumPlayedGames() const;
+    int getGoals() const;
+    int getCards() const;
+    Team* getTeam() const;
+    bool isGoalKeeper() const;
+    //
+    Player* getRankNext() const;
+    Player* getRankPrev() const;
+    void updateNextRank(Player* next);
+    void updatePrevRank(Player* prev);
     void removeFromTeam();
     Tuple getStatsTuple();
 
@@ -36,8 +41,8 @@ private:
     int cards;
     bool goalKeeper;
     Team* team;
-    int closestPlayerId;
-    int refById;
+    Player* nextRank;
+    Player* prevRank;
 };
 
 #endif // PLAYER_H_
