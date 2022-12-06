@@ -20,7 +20,7 @@ private:
 };
 
 template <class K, class T>
-Pair<K, T>::Pair(const K& key, const T& value) :
+Pair<K, T>::Pair(const K& key, const T& value):
     m_key(key),
     m_value(value)
 {}
@@ -44,4 +44,6 @@ template<class K, class T>
 void Pair<K, T>::setValue(const T &value) {
     m_value = value;
 }
+
 #endif // PAIR_H_
+

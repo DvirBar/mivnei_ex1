@@ -22,7 +22,7 @@ Player::Player(
 };
 
 void Player::removeFromTeam() {
-    team->removePlayer(this);
+    team->removePlayer(this->getId());
 }
 
 int Player::getId() const {
@@ -41,9 +41,20 @@ void Player::updatePrevRank(Player* prev) {
     prevRank = prev;
 }
 
-Tuple Player::getStatsTuple() {
+const Tuple Player::getStatsTuple() const {
     return Tuple(goals, cards, playerId);
 }
 
+int Player::getCards() const {
+    return cards;
+}
+
+int Player::getGoals() const {
+    return goals;
+}
+
+bool Player::isGoalKeeper() const {
+    return goalKeeper;
+}
 
 

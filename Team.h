@@ -9,13 +9,6 @@
 
 using namespace std;
 
-enum struct GameResult
-{
-    WON = 0,
-    LOST = 1,
-    TIE = 2
-};
-
 // Forward declaration to break circular dependancy
 class Player;
 
@@ -25,10 +18,10 @@ public:
     Team(const Team &team);
     ~Team();
 
-    StatusType remove_team();
-    int get_top_scorer();
     void addPoints(int pointsToAdd);
     void addGames(int numGamesToAdd);
+    void setCards(int cards);
+    void setGoals(int goals);
     int getNumPlayers () const;
     int getNumGoalKeepers() const;
     bool isValidTeam() const;
@@ -40,9 +33,8 @@ public:
     int getId() const;
     const AVLTree<Tuple, Player*>& getStatsTree() const;
     StatusType get_all_players(int* const output);
-    void conclude_game(GameResult result);
     void addPlayer(Player* player);
-    void removePlayer(Player* player);
+    void removePlayer(int playerId);
     
     void createStatsArray(Pair<Tuple, Player*>* arr);
     void createIdsArray(Pair<int, Player*>* arr);
@@ -50,6 +42,15 @@ public:
     // TODO: implement
     void fillStatsFromArray(Pair<Tuple, Player*>* arr, int size);
     void fillIdsFromArray(Pair<int, Player*>* arr, int size);
+    Team* getNextValidRank() const;
+    Team* getPrevValidRank() const;
+    int getTeamId() const;
+    int getTotalStats() const;
+    
+    Player* getTopScorer() const;
+    void setTopScorer(Player* newTopScorer);
+    void setNextValidRank(Team* next);
+    void setPrevValidRank(Team* prev);
 
     Player* findPlayerById(int playerId);
     static Team* unite_teams(Team* team1, Team* team2, int newTeamId);
@@ -65,7 +66,9 @@ private:
     int totalGoals;
     int numPlayers;
     int numGoalkeepers;
-    int teamTopScorer;
+    Player* teamTopScorer;
+    Team* nextValidRank;
+    Team* prevValidRank;
     int totalGamesPlayed;
     AVLTree<int, Player*> teamPlayersByID;
     AVLTree<Tuple, Player*> teamPlayersByStats;

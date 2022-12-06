@@ -20,13 +20,14 @@
 #include "Team.h"
 #include "Player.h"
 #include "Tuple.h"
+#include "Pair.h"
 
 using namespace std;
 
 class world_cup_t {
 private:
 	AVLTree<int, Team*> teams;
-	AVLTree<int, Player*> playersByID;
+    AVLTree<int, Player*> playersByID;
     AVLTree<Tuple, Player*> playersByStats;
     Player* topScorer;
     int numPlayersOverall;
@@ -34,13 +35,11 @@ private:
     void addPlayerAux(int playerId, int teamId, int gamesPlayed,
                          int goals, int cards, bool goalKeeper);
     Player* removePlayerAux(int playerId);
-    // Excecutes on insert and remove player to find closest in O(log(n))
     Player* findPlayerClosest(int playerId, int teamId) const;
     static Player* closestAux(int playerVal,  Player* prev, int prevVal,
                               Player* next, int nextVal);
-    static const int EQUAL = 0;
-    static const int PREV = 1;
-    static const int NEXT = 2;
+    AVLTree<int, Team*> validKnockoutTeams;
+    static Pair<int, int> compareKnockoutTeams(const Pair<int, int>& firstTeam, const Pair<int, int>& secondTeam);
 public:
 	// <DO-NOT-MODIFY> {
 

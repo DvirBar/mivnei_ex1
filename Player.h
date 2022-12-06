@@ -20,19 +20,21 @@ public:
     StatusType update_stats(int gamesPlayed, int scoredGoals,
                             int cardsReceived);
     int getId() const;
+
     // TODO: implement
     int getNumPlayedGames() const;
-    int getGoals() const;
-    int getCards() const;
     Team* getTeam() const;
     bool isGoalKeeper() const;
-    //
     Player* getRankNext() const;
     Player* getRankPrev() const;
     void updateNextRank(Player* next);
     void updatePrevRank(Player* prev);
+    int getGoals() const;
+    int getCards() const;
     void removeFromTeam();
-    Tuple getStatsTuple();
+    void updateNextInRank(Player* next);
+    void updatePrevInRank(Player* prev);
+    const Tuple getStatsTuple() const;
 
 private:
     int playerId;
