@@ -129,6 +129,7 @@ Team* Team::unite_teams(Team* team1, Team* team2, int newTeamId) {
     for(int i=0; i<newArrSize; i++) {
         Player* curPlayer = newIdsArr[i].getValue();
         curPlayer->setGamesPlayed(curPlayer->getNumPlayedGames());
+        curPlayer->setTeam(newTeam);
     }
     
     newTeam->fillStatsFromArray(newStatsArr, newArrSize);

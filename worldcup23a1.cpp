@@ -323,11 +323,13 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         
         Team* newTeam = Team::unite_teams(team1, team2, newTeamId);
         teams.remove(teamId1);
+        delete team1;
         if(team1->isValidTeam()) {
             removeValidTeam(team1);
         }
         
         teams.remove(teamId2);
+        delete team2;
         if(team2->isValidTeam()) {
             removeValidTeam(team2);
         }

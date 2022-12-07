@@ -33,6 +33,7 @@ public:
     void setCards(int cards);
     void setIsGoalKeeper(bool isGoalKeeper);
     void setGamesPlayed(int gamesPlayed);
+    void setTeam(Team* team);
     void removeFromTeam();
     void updateNextInRank(Player* next);
     void updatePrevInRank(Player* prev);

@@ -85,4 +85,7 @@ Team* Player::getTeam() const {
     return team;
 }
 
+void Player::setTeam(Team* team) {
+    this->team = team;
+}
 
