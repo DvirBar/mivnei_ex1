@@ -70,6 +70,12 @@ StatusType world_cup_t::remove_team(int teamId)
 	return StatusType::SUCCESS;
 }
 
+void world_cup_t::updateOverallTopScorer(Player *player) {
+    if((topScorer == nullptr) || (topScorer->getStatsTuple() < player->getStatsTuple()))
+        topScorer = player;
+
+}
+
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 								   int goals, int cards, bool goalKeeper)
 {
@@ -132,11 +138,8 @@ void world_cup_t::addPlayerAux(Player* player, Team* team) {
     player->updatePrevInRank(playersByStats.prevInorder(player->getStatsTuple()));
     player->updateNextInRank(playersByStats.nextInorder(player->getStatsTuple()));
 
-    if(player->getStatsTuple() > topScorer->getStatsTuple()) {
-        topScorer = player;
-    }
-    if(player->getStatsTuple() > team->getTopScorer()->getStatsTuple())
-        team->setTopScorer(player);
+    updateOverallTopScorer(player);
+    team->updateTopScorer(player);
 }
 
 Player* world_cup_t::removePlayerAux(int playerId) {
@@ -450,88 +453,78 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 
     Team* firstTeamInRange;
 
-    try{
-        firstTeamInRange = validKnockoutTeams.findFirstInRange(minTeamId);
-    }
-    catch (const KeyNotFound& keyNotFound) {
-        return StatusType::INVALID_INPUT;
-    }
-
-    Team* currentTeam = firstTeamInRange;
-    int initialNumTeams = 0;
-    while(currentTeam != nullptr && currentTeam->getTeamId() < maxTeamId) {
-        initialNumTeams++;
-        currentTeam = currentTeam->getNextValidRank();
-    }
-
-    Pair<int,int>* initialTeamArray;
     try {
+        firstTeamInRange = validKnockoutTeams.findFirstInRange(minTeamId);
+        Team *currentTeam = firstTeamInRange;
+        int initialNumTeams = 0;
+
+        while (currentTeam != nullptr && currentTeam->getTeamId() < maxTeamId) {
+            initialNumTeams++;
+            currentTeam = currentTeam->getNextValidRank();
+        }
+
+        Pair<int, int> *initialTeamArray;
         initialTeamArray = new Pair<int, int>[initialNumTeams];
+
+        currentTeam = firstTeamInRange;
+        for (int i = 0; i < initialNumTeams; i++) {
+            initialTeamArray[i].setKey(currentTeam->getTeamId());
+            initialTeamArray[i].setValue(currentTeam->getTotalStats());
+            currentTeam = currentTeam->getNextValidRank();
+        }
+
+        Pair<int, int> *prevArray = initialTeamArray;
+        int currentTeamArraySize = initialNumTeams;
+        Pair<int, int> *knockoutArray;
+        while (currentTeamArraySize > 1) {
+
+            if (currentTeamArraySize % 2 == 0) {
+                currentTeamArraySize /= 2;
+
+                knockoutArray = new Pair<int, int>[currentTeamArraySize];
+
+                int arrayIndex = 0;
+                for (int i = 1; i < initialNumTeams; i += 2) {
+                    knockoutArray[arrayIndex] = compareKnockoutTeams(prevArray[i], prevArray[i - 1]);
+                    arrayIndex++;
+                }
+                delete[] prevArray;
+                prevArray = knockoutArray;
+                initialNumTeams = currentTeamArraySize;
+                continue;
+            }
+
+            if (currentTeamArraySize % 2 == 1) {
+                currentTeamArraySize = ((currentTeamArraySize - 1) / 2) + 1;
+
+                knockoutArray = new Pair<int, int>[currentTeamArraySize];
+
+                int arrayIndex = 0;
+                for (int i = 1; i < initialNumTeams; i += 2) {
+                    knockoutArray[arrayIndex] = compareKnockoutTeams(prevArray[i], prevArray[i - 1]);
+                    arrayIndex++;
+                }
+                knockoutArray[currentTeamArraySize - 1].setKey(prevArray[initialNumTeams - 1].getKey());
+                knockoutArray[currentTeamArraySize - 1].setValue(prevArray[initialNumTeams - 1].getValue());
+                delete[] prevArray;
+                prevArray = knockoutArray;
+                initialNumTeams = currentTeamArraySize;
+            }
+        }
+
+        int winID = prevArray[0].getKey();
+        delete[] prevArray;
+        return winID;
     }
+
+    catch(const KeyNotFound& keyNotFound) {
+        return StatusType::FAILURE;
+    }
+
     catch (const bad_alloc& badAlloc) {
         return StatusType::ALLOCATION_ERROR;
     }
 
-    currentTeam = firstTeamInRange;
-    for(int i = 0; i <  initialNumTeams; i++) {
-        initialTeamArray[i].setKey(currentTeam->getTeamId());
-        initialTeamArray[i].setValue(currentTeam->getTotalStats());
-        currentTeam = currentTeam->getNextValidRank();
-    }
-
-    Pair<int,int>* prevArray = initialTeamArray;
-    int currentTeamArraySize = initialNumTeams;
-    Pair<int, int>* knockoutArray;
-    while(currentTeamArraySize > 1) {
-
-        if(currentTeamArraySize % 2 == 0) {
-            currentTeamArraySize /= 2;
-
-            try {
-                knockoutArray = new Pair<int, int>[currentTeamArraySize];
-            }
-            catch (const bad_alloc& badAlloc) {
-                return StatusType::ALLOCATION_ERROR;
-            }
-
-
-            int arrayIndex = 0;
-            for(int i = 1; i < initialNumTeams; i += 2) {
-                knockoutArray[arrayIndex] = compareKnockoutTeams(prevArray[i], prevArray[i - 1]);
-                arrayIndex++;
-            }
-            delete[] prevArray;
-            prevArray = knockoutArray;
-            initialNumTeams = currentTeamArraySize;
-            continue;
-        }
-
-        if(currentTeamArraySize % 2 == 1) {
-            currentTeamArraySize = ((currentTeamArraySize - 1) / 2) + 1;
-
-            try {
-                knockoutArray = new Pair<int, int>[currentTeamArraySize];
-            }
-            catch (const bad_alloc& badAlloc) {
-                return StatusType::ALLOCATION_ERROR;
-            }
-
-            int arrayIndex = 0;
-            for(int i = 1; i < initialNumTeams; i += 2) {
-                knockoutArray[arrayIndex] = compareKnockoutTeams(prevArray[i], prevArray[i - 1]);
-                arrayIndex++;
-            }
-            knockoutArray[currentTeamArraySize - 1].setKey(prevArray[initialNumTeams - 1].getKey());
-            knockoutArray[currentTeamArraySize - 1].setValue(prevArray[initialNumTeams - 1].getValue());
-            delete[] prevArray;
-            prevArray = knockoutArray;
-            initialNumTeams = currentTeamArraySize;
-        }
-    }
-
-    int winID = prevArray[0].getKey();
-    delete[] prevArray;
-    return winID;
 }
 
 Pair<int, int> world_cup_t::compareKnockoutTeams(const Pair<int, int> &firstTeam, const Pair<int, int> &secondTeam) {

@@ -35,6 +35,7 @@ private:
     void addPlayerAux(Player* player, Team* team);
     Player* removePlayerAux(int playerId);
     Player* findPlayerClosest(int playerId, int teamId) const;
+    void updateOverallTopScorer(Player* player);
     static Player* closestAux(int playerVal,  Player* prev, int prevVal,
                               Player* next, int nextVal);
     AVLTree<int, Team*> validKnockoutTeams;

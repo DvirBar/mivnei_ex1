@@ -22,7 +22,8 @@ public:
     void addGames(int numGamesToAdd);
     void setCards(int cards);
     void setGoals(int goals);
-    int getNumPlayers () const;
+    int getNumPlayers() const;
+    void updateTopScorer(Player* player);
     int getNumGoalKeepers() const;
     bool isValidTeam() const;
     int getTotalGoals() const;

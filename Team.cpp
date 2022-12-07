@@ -175,3 +175,8 @@ Team* Team::getPrevValidRank() const {
 int Team::getTotalStats() const {
     return totalPoints + totalGoals - totalCards;
 }
+
+void Team::updateTopScorer(Player *player) {
+    if(teamTopScorer == nullptr || teamTopScorer->getStatsTuple() < player->getStatsTuple())
+        teamTopScorer = player;
+}
