@@ -123,13 +123,17 @@ StatusType world_cup_t::remove_player(int playerId)
 void world_cup_t::addValidTeam(Team* team) {
     validKnockoutTeams.insert(team->getId(), team);
     try {
-        team->setNextValidRank(validKnockoutTeams.nextInorder(team->getId()));
+        Team* nextTeam = validKnockoutTeams.nextInorder(team->getId());
+        team->setNextValidRank(nextTeam);
+        nextTeam->setPrevValidRank(team);
     } catch(const NoNextInorder& error) {
         team->setNextValidRank(nullptr);
     }
 
     try {
-        team->setPrevValidRank(validKnockoutTeams.prevInorder(team->getId()));
+        Team* prevTeam = validKnockoutTeams.prevInorder(team->getId());
+        team->setPrevValidRank(prevTeam);
+        prevTeam->setNextValidRank(team);
     } catch(const NoPrevInorder& error) {
         team->setPrevValidRank(nullptr);
     }
@@ -147,13 +151,17 @@ void world_cup_t::addPlayerAux(Player* player, Team* team) {
     }
     
     try {
-        player->updatePrevInRank(playersByStats.prevInorder(player->getStatsTuple()));
+        Player* prev = playersByStats.prevInorder(player->getStatsTuple());
+        player->updatePrevInRank(prev);
+        prev->updateNextInRank(player);
     } catch(const NoPrevInorder& error) {
         player->updatePrevInRank(nullptr);
     }
     
     try {
-        player->updateNextInRank(playersByStats.nextInorder(player->getStatsTuple()));
+        Player* next = playersByStats.nextInorder(player->getStatsTuple());
+        player->updateNextInRank(next);
+        next->updatePrevInRank(player);
     } catch(const NoNextInorder& error) {
         player->updateNextInRank(nullptr);
     }
@@ -326,8 +334,6 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         if(team1->isValidTeam()) {
             removeValidTeam(team1);
         }
-        
-        
         
         if(team2->isValidTeam()) {
             removeValidTeam(team2);
