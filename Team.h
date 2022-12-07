@@ -55,6 +55,7 @@ public:
     void setGamesPlayed(int games);
     void setGoalGoalKeepers(int numGoalkeeper);
     Player* findPlayerById(int playerId);
+    bool isEmpty();
     static Team* unite_teams(Team* team1, Team* team2, int newTeamId);
     // TODO: implement
     static void mergeArrays(Player** newArr, int newArrSize, Player** arr1,
@@ -66,7 +67,6 @@ private:
     int totalPoints;
     int totalCards;
     int totalGoals;
-    int numPlayers;
     int numGoalkeepers;
     Player* teamTopScorer;
     Team* nextValidRank;
@@ -77,6 +77,7 @@ private:
     
     // TODO: implement
     void clearTeam();
+    void uniteTopScorers(Team* team1, Team* team2);
 };
 
 #endif // TEAM_H_

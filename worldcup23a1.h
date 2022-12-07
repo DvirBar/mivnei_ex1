@@ -29,8 +29,8 @@ private:
 	AVLTree<int, Team*> teams;
     AVLTree<int, Player*> playersByID;
     AVLTree<Tuple, Player*> playersByStats;
+    AVLTree<int, Team*> validKnockoutTeams;
     Player* topScorer;
-    int numPlayersOverall;
     
     void addPlayerAux(Player* player, Team* team);
     Player* removePlayerAux(int playerId);
@@ -38,7 +38,6 @@ private:
     void updateOverallTopScorer(Player* player);
     static Player* closestAux(int playerVal,  Player* prev, int prevVal,
                               Player* next, int nextVal);
-    AVLTree<int, Team*> validKnockoutTeams;
     static Pair<int, int> compareKnockoutTeams(const Pair<int, int>& firstTeam, const Pair<int, int>& secondTeam);
     void removeValidTeam(Team* team);
     void addValidTeam(Team* team);

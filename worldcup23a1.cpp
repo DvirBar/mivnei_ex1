@@ -10,8 +10,7 @@ world_cup_t::world_cup_t():
     playersByStats(),
     playersByID(),
     validKnockoutTeams(),
-    topScorer(nullptr),
-    numPlayersOverall(0)
+    topScorer(nullptr)
 {}
 
 world_cup_t::~world_cup_t() {
@@ -60,7 +59,7 @@ StatusType world_cup_t::remove_team(int teamId)
     }
     try {
         Team* team = teams.search(teamId);
-        if(team->getNumPlayers() > 0) {
+        if(team->isEmpty()) {
             return StatusType::FAILURE;
         }
         teams.remove(teamId);
@@ -312,6 +311,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         if(newTeam->isValidTeam()) {
             addValidTeam(newTeam);
         }
+        
         
         return StatusType::SUCCESS;
     } catch (const KeyNotFound& error) {

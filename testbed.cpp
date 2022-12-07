@@ -2,33 +2,56 @@
 #include "Player.h"
 #include "Exception.h"
 
+//
+//template<class T>
+//void printArray(T* arr, int size);
+
 int main() {
     AVLTree<int, int> *tree = new AVLTree<int, int>();
-    for(int i=1; i<=10; i++) {
+    int size1 = 6;
+    for(int i=1; i<=size1; i++) {
+        tree->insert(i, i);
+    }
+    
+    int size2 = 20;
+    for(int i=10; i<=size2; i++) {
         tree->insert(i, i);
     }
 
     tree->printTree();
-    tree->remove(1);
-    tree->printTree();
-    tree->remove(2);
-    tree->printTree();
-    tree->remove(3);
-    tree->printTree();
-    tree->remove(8);
-    tree->printTree();
-    tree->remove(9);
-    tree->printTree();
     cout << endl;
-//    try {
-//        cout << "Next inorder of 6: " << tree->nextInorder(6) << endl;
-//        cout << "Prev inorder of 1: " << tree->prevInorder(2) << endl;
-//    } catch(const NoNextInorder& error) {
-//        cout << "No next inorder for 5" << endl;
-//    } catch (const NoPrevInorder& error) {
-//        cout << "No prev inorder for 1" << endl;
-//    } catch(const KeyNotFound& error) {
-//        cout << "No such key" << endl;
-//    }
+    try {
+        cout << "First in range is " << tree->findFirstInRange(20) << endl;
+    } catch(const KeyNotFound& error) {
+        cout << "not found" << endl;
+    }
     
-}
+//    tree->printTree();
+    
+//    for(int i=0; i<size; i++) {
+//        cout << output[i].getValue() << " ";
+//    }
+//
+    cout << endl;
+
+//    try {
+//
+//    } catch(const NoNextInorder& error) {
+//        cout << key << " doesn't have next" << endl;
+//    } catch(const NoPrevInorder& error) {
+//        cout << key << " doesn't have prev" << endl;
+//    } catch(const KeyNotFound& error) {
+//        cout << key << " not found" << endl;
+//    }
+ }
+
+//template<class T>
+//void printArray(T* arr, int size) {
+//    for(int i=0; i<size; i++) {
+//        cout << arr[i] << " ";
+//    }
+//
+//    cout << endl;
+//}
+
+

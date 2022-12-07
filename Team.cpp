@@ -8,7 +8,6 @@ Team::Team(int teamId, int points) :
     totalPoints(points),
     totalCards(0),
     totalGoals(0),
-    numPlayers(0),
     numGoalkeepers(0),
     teamTopScorer(nullptr),
     nextValidRank(nullptr),
@@ -19,7 +18,7 @@ Team::Team(int teamId, int points) :
 {}
 
 int Team::getNumPlayers() const {
-    return numPlayers;
+    return teamPlayersByID.getNumNodes();
 }
 
 int Team::getNumGoalKeepers() const {
@@ -27,7 +26,7 @@ int Team::getNumGoalKeepers() const {
 }
 
 bool Team::isValidTeam() const {
-    return ((numPlayers >= 11) && (numGoalkeepers > 0));
+    return ((getNumPlayers() >= 11) && (numGoalkeepers > 0));
 }
 
 void Team::addPoints(int pointsToAdd) {
@@ -70,6 +69,30 @@ const AVLTree<Tuple, Player *>& Team::getStatsTree() const {
     return teamPlayersByStats;
 }
 
+void Team::uniteTopScorers(Team* team1, Team* team2) {
+    if(team1->isEmpty() && team2->isEmpty()) {
+        return;
+    }
+    
+    if(team1->isEmpty()) {
+        teamTopScorer = team2->getTopScorer();
+        return;
+    }
+    
+    if(team2->isEmpty()) {
+        teamTopScorer = team1->getTopScorer();
+        return;
+    }
+    
+    if(team1->getTopScorer()->getStatsTuple() > team2->getTopScorer()->getStatsTuple()) {
+        setTopScorer(team1->getTopScorer());
+    }
+    
+    else {
+        setTopScorer(team2->getTopScorer());
+    }
+}
+
 Team* Team::unite_teams(Team* team1, Team* team2, int newTeamId) {
     Team* newTeam = new Team(newTeamId, team1->getTotalPoints() + team2->getTotalPoints());
     
@@ -78,13 +101,7 @@ Team* Team::unite_teams(Team* team1, Team* team2, int newTeamId) {
     newTeam->setGoals(team1->getTotalGoals()+team2->getTotalGoals());
     newTeam->addPoints(team1->getTotalPoints()+team2->getTotalPoints());
     newTeam->setGoalGoalKeepers(team1->getNumGoalKeepers()+team2->getNumGoalKeepers());
-    if(team1->getTopScorer()->getStatsTuple() > team2->getTopScorer()->getStatsTuple()) {
-        newTeam->setTopScorer(team1->getTopScorer());
-    }
-    
-    else {
-        newTeam->setTopScorer(team2->getTopScorer());
-    }
+    newTeam->uniteTopScorers(team1, team2);
     
     int team1Size = team1->getNumPlayers();
     int team2Size = team2->getNumPlayers();
@@ -159,12 +176,15 @@ void Team::removePlayer(int playerId) {
         numGoalkeepers--;
 }
 
+bool Team::isEmpty() {
+    return teamPlayersByID.isEmpty();
+}
+
 void Team::addPlayer(Player* playerToInsert) {
     teamPlayersByID.insert(playerToInsert->getId(), playerToInsert);
     teamPlayersByStats.insert(playerToInsert->getStatsTuple(), playerToInsert);
     setGoals(playerToInsert->getGoals());
     setCards(playerToInsert->getCards());
-    numPlayers++;
     if(playerToInsert->isGoalKeeper())
         numGoalkeepers++;
 }
