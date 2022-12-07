@@ -38,3 +38,10 @@ bool operator==(const Tuple& tuple1, const Tuple& tuple2) {
 bool operator<(const Tuple& tuple1, const Tuple& tuple2) {
     return tuple2 > tuple1;
 }
+
+ostream& operator<<(ostream& os, const Tuple& tuple) {
+   os << "<" << tuple.primaryValue << ", " << tuple.secondaryValue <<
+   ", " << tuple.tertiaryValue << ">";
+   
+   return os;
+}

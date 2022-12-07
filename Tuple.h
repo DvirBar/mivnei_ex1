@@ -1,6 +1,10 @@
 #ifndef Tuple_h
 #define Tuple_h
 
+#include <iostream>
+
+using namespace std;
+
 class Tuple {
 public:
     Tuple();
@@ -16,6 +20,7 @@ private:
 
     friend bool operator>(const Tuple& tuple1, const Tuple& tuple2);
     friend bool operator==(const Tuple& tuple1, const Tuple& tuple2);
+    friend ostream& operator<<(ostream& os, const Tuple& tuple);
 };
 
 bool operator<(const Tuple& tuple1, const Tuple& tuple2);

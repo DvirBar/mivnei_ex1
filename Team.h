@@ -16,7 +16,7 @@ class Team {
 public:
     Team(int teamId, int points);
     Team(const Team &team);
-    ~Team();
+    ~Team() = default;
 
     void addPoints(int pointsToAdd);
     void addGame();

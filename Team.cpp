@@ -189,6 +189,10 @@ void Team::addPlayer(Player* playerToInsert) {
         numGoalkeepers++;
 }
 
+int Team::getId() const{
+    return teamId;
+}
+
 Player* Team::getTopScorer() const {
     return teamTopScorer;
 }

@@ -1,0 +1,4 @@
+add_team 3 30000
+add_player 3001 3 30 0 0 false
+add_player 3011 3 30 0 0 true
+update_player_stats 3011 2 1 1

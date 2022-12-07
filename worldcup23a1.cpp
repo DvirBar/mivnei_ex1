@@ -6,10 +6,6 @@
 #include "Pair.h"
 
 world_cup_t::world_cup_t():
-    teams(),
-    playersByStats(),
-    playersByID(),
-    validKnockoutTeams(),
     topScorer(nullptr)
 {}
 
@@ -59,18 +55,17 @@ StatusType world_cup_t::remove_team(int teamId)
     }
     try {
         Team* team = teams.search(teamId);
-        if(team->isEmpty()) {
+        if(!team->isEmpty()) {
             return StatusType::FAILURE;
         }
         teams.remove(teamId);
         delete team;
+        return StatusType::SUCCESS;
     } catch(const KeyNotFound& error) {
         return StatusType::FAILURE;
     } catch(const bad_alloc& error) {
         return StatusType::ALLOCATION_ERROR;
     }
-    
-	return StatusType::SUCCESS;
 }
 
 void world_cup_t::updateOverallTopScorer(Player *player) {
@@ -127,8 +122,18 @@ StatusType world_cup_t::remove_player(int playerId)
 
 void world_cup_t::addValidTeam(Team* team) {
     validKnockoutTeams.insert(team->getId(), team);
-    team->setNextValidRank(validKnockoutTeams.nextInorder(team->getId()));
-    team->setPrevValidRank(validKnockoutTeams.prevInorder(team->getId()));
+    try {
+        team->setNextValidRank(validKnockoutTeams.nextInorder(team->getId()));
+    } catch(const NoNextInorder& error) {
+        team->setNextValidRank(nullptr);
+    }
+
+    try {
+        team->setPrevValidRank(validKnockoutTeams.prevInorder(team->getId()));
+    } catch(const NoPrevInorder& error) {
+        team->setPrevValidRank(nullptr);
+    }
+
 }
 
 void world_cup_t::addPlayerAux(Player* player, Team* team) {
@@ -140,10 +145,19 @@ void world_cup_t::addPlayerAux(Player* player, Team* team) {
     if(!wasValid && team->isValidTeam()) {
         addValidTeam(team);
     }
-
-    player->updatePrevInRank(playersByStats.prevInorder(player->getStatsTuple()));
-    player->updateNextInRank(playersByStats.nextInorder(player->getStatsTuple()));
-
+    
+    try {
+        player->updatePrevInRank(playersByStats.prevInorder(player->getStatsTuple()));
+    } catch(const NoPrevInorder& error) {
+        player->updatePrevInRank(nullptr);
+    }
+    
+    try {
+        player->updateNextInRank(playersByStats.nextInorder(player->getStatsTuple()));
+    } catch(const NoNextInorder& error) {
+        player->updateNextInRank(nullptr);
+    }
+    
     updateOverallTopScorer(player);
     team->updateTopScorer(player);
 }
@@ -152,8 +166,13 @@ void world_cup_t::removeValidTeam(Team* team) {
     Team* prev = team->getPrevValidRank();
     Team* next = team->getNextValidRank();
     validKnockoutTeams.remove(team->getId());
-    prev->setNextValidRank(next);
-    next->setPrevValidRank(prev);
+    if(prev != nullptr) {
+        prev->setNextValidRank(next);
+    }
+    
+    if(next != nullptr) {
+        next->setPrevValidRank(prev);
+    }
 }
 
 Player* world_cup_t::removePlayerAux(int playerId) {
@@ -162,8 +181,14 @@ Player* world_cup_t::removePlayerAux(int playerId) {
     Player* rankNext = removedPlayer->getRankNext();
     Player* rankPrev = removedPlayer->getRankPrev();
     
-    rankNext->updatePrevRank(rankPrev);
-    rankPrev->updateNextRank(rankNext);
+    if(rankNext != nullptr) {
+        rankNext->updatePrevInRank(rankPrev);
+    }
+    
+    if(rankPrev != nullptr) {
+        rankPrev->updateNextInRank(rankNext);
+    }
+    
 
     Team* team = removedPlayer->getTeam();
     bool wasValid = team->isValidTeam();
@@ -489,7 +514,7 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId) {
     }
 }
 
-Player* closestAux(int playerVal, Player* prev, int prevVal, Player* next,
+Player* world_cup_t::closestAux(int playerVal, Player* prev, int prevVal, Player* next,
                    int nextVal) {
     if(abs(playerVal-prevVal) < abs(playerVal-nextVal)) {
         return prev;

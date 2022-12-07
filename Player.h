@@ -27,8 +27,6 @@ public:
     bool isGoalKeeper() const;
     Player* getRankNext() const;
     Player* getRankPrev() const;
-    void updateNextRank(Player* next);
-    void updatePrevRank(Player* prev);
     int getGoals() const;
     int getCards() const;
     void setGoals(int goals);
@@ -47,8 +45,8 @@ private:
     int cards;
     bool goalKeeper;
     Team* team;
-    Player* nextRank;
     Player* prevRank;
+    Player* nextRank;
 };
 
 #endif // PLAYER_H_

@@ -36,7 +36,7 @@ private:
     Player* removePlayerAux(int playerId);
     Player* findPlayerClosest(int playerId, int teamId) const;
     void updateOverallTopScorer(Player* player);
-    static Player* closestAux(int playerVal,  Player* prev, int prevVal,
+    static Player* closestAux(int playerVal, Player* prev, int prevVal,
                               Player* next, int nextVal);
     static Pair<int, int> compareKnockoutTeams(const Pair<int, int>& firstTeam, const Pair<int, int>& secondTeam);
     void removeValidTeam(Team* team);

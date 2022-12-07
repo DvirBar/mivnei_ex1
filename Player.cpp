@@ -33,11 +33,11 @@ int Player::getNumPlayedGames() const {
     return gamesPlayed+team->getTotalGamesPlayed();
 }
 
-void Player::updateNextRank(Player* next) {
+void Player::updateNextInRank(Player* next) {
     nextRank = next;
 }
 
-void Player::updatePrevRank(Player* prev) {
+void Player::updatePrevInRank(Player* prev) {
     prevRank = prev;
 }
 
@@ -71,6 +71,18 @@ void Player::setIsGoalKeeper(bool isGoalKeeper) {
 
 void Player::setGamesPlayed(int gamesPlayed) {
     this->gamesPlayed = gamesPlayed-team->getTotalGamesPlayed();
+}
+
+Player* Player::getRankNext() const {
+    return nextRank;
+}
+
+Player* Player::getRankPrev() const {
+    return prevRank;
+}
+
+Team* Player::getTeam() const {
+    return team;
 }
 
 

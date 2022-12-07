@@ -18,8 +18,8 @@ class AVLTree
     public:
         K key;
         T data;
-        AVLNode *rightChild;
         AVLNode *leftChild;
+        AVLNode *rightChild;
         int height;
         
         AVLNode();
@@ -91,7 +91,9 @@ AVLTree<K, T>::AVLTree():
 
 template <class K, class T>
 AVLTree<K, T>::~AVLTree() {
-    deleteTreeAux(root);
+    if(!isEmpty()) {
+        deleteTreeAux(root);
+    }
 }
 
 template <class K, class T>
@@ -119,16 +121,16 @@ template<class K, class T>
 AVLTree<K, T>::AVLNode::AVLNode(const K& key, const T& data):
     key(key),
     data(data),
-    height(0),
     leftChild(nullptr),
-    rightChild(nullptr)
+    rightChild(nullptr),
+    height(0)
 {}
 
 template<class K, class T>
 AVLTree<K, T>::AVLNode::AVLNode():
-    height(0),
     leftChild(nullptr),
-    rightChild(nullptr)
+    rightChild(nullptr),
+    height(0)
 {}
  
 
@@ -473,10 +475,10 @@ void AVLTree<K, T>::print2DUtil(AVLNode* root, int space) {
     space += COUNT;
 
     print2DUtil(root->rightChild, space);
-    printf("\n");
+    cout << endl;
     for (int i = COUNT; i < space; i++)
-        printf(" ");
-    printf("%d\n", root->key);
+        cout << " " << endl;
+    cout << root->key << endl;
     print2DUtil(root->leftChild, space);
 }
 
