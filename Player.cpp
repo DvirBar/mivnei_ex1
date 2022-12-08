@@ -19,7 +19,7 @@ Player::Player(
     this->gamesPlayed = gamesPlayed-team->getTotalGamesPlayed();
     this->goals = goals;
     this->cards = cards;
-};
+}
 
 void Player::removeFromTeam() {
     team->removePlayer(this->getId());

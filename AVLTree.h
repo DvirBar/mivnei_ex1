@@ -244,7 +244,7 @@ typename AVLTree<K, T>::AVLNode *AVLTree<K, T>::insert(const K &key, const T &da
     root = insertByNode(root, key, data);
     numNodes++;
     return root;
-};
+}
 
 template <class T, class K>
 int AVLTree<T, K>::getNodeHeight(AVLTree::AVLNode *node) {
