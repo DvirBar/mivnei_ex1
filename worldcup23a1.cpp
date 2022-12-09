@@ -189,9 +189,7 @@ void world_cup_t::removeValidTeam(Team* team) {
 }
 
 Player* world_cup_t::removePlayerAux(int playerId) {
-//    playersByID.printTree();
     Player* removedPlayer = playersByID.remove(playerId);
-//    playersByID.printTree();
     playersByStats.remove(removedPlayer->getStatsTuple());
     Player* rankNext = removedPlayer->getRankNext();
     Player* rankPrev = removedPlayer->getRankPrev();
