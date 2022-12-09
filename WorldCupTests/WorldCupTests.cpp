@@ -489,7 +489,6 @@ TEST_CASE("add and remove player")
         REQUIRE(res == StatusType::SUCCESS);
         res = obj->add_player(1012, 1, 10, 0, 0, false);
         REQUIRE(res == StatusType::SUCCESS);
-
         res = obj->add_player(2001, 2, 20, 0, 0, false);
         REQUIRE(res == StatusType::SUCCESS);
         res = obj->add_player(2002, 2, 20, 0, 0, false);
@@ -547,6 +546,7 @@ TEST_CASE("add and remove player")
         REQUIRE(res == StatusType::SUCCESS);
         res = obj->remove_player(3002);
         REQUIRE(res == StatusType::SUCCESS);
+
         res = obj->remove_player(3010);
         REQUIRE(res == StatusType::SUCCESS);
         res = obj->remove_player(3009);

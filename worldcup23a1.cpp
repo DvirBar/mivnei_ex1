@@ -3,7 +3,9 @@
 #include "Player.h"
 #include "Exception.h"
 #include <cmath>
+#include <exception>
 #include "Pair.h"
+#include <iostream>
 
 world_cup_t::world_cup_t():
     topScorer(nullptr)
@@ -79,7 +81,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 {
     // TODO: we don't need that, we have it in constructor
     if(playerId <= 0 || gamesPlayed < 0 || goals < 0 ||
-       cards < 0 || (gamesPlayed == 0 && (goals > 0 || cards > 0))) {
+       cards < 0 || teamId <= 0 ||  (gamesPlayed == 0 && (goals > 0 || cards > 0))) {
         return StatusType::INVALID_INPUT;
     }
 
@@ -114,9 +116,12 @@ StatusType world_cup_t::remove_player(int playerId)
         delete player;
         return StatusType::SUCCESS;
     } catch(const KeyNotFound& error) {
-        return StatusType::INVALID_INPUT;
+        return StatusType::FAILURE;
     } catch(const bad_alloc& error) {
         return StatusType::ALLOCATION_ERROR;
+    } catch(const exception& error) {
+        cout << error.what() << endl;
+        return StatusType::FAILURE;
     }
 }
 
@@ -184,7 +189,9 @@ void world_cup_t::removeValidTeam(Team* team) {
 }
 
 Player* world_cup_t::removePlayerAux(int playerId) {
+//    playersByID.printTree();
     Player* removedPlayer = playersByID.remove(playerId);
+//    playersByID.printTree();
     playersByStats.remove(removedPlayer->getStatsTuple());
     Player* rankNext = removedPlayer->getRankNext();
     Player* rankPrev = removedPlayer->getRankPrev();
@@ -213,7 +220,6 @@ Player* world_cup_t::removePlayerAux(int playerId) {
     if(team->getTopScorer()->getId() == removedPlayer->getId()) {
         team->setTopScorer(removedPlayer->getRankPrev());
     }
-    
     return removedPlayer;
 }
 
@@ -384,7 +390,7 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
     }
     
     catch(const KeyNotFound& error) {
-        return output_t<int>(StatusType::INVALID_INPUT);
+        return output_t<int>(StatusType::FAILURE);
     }
     
     catch(const bad_alloc& error) {
@@ -542,15 +548,21 @@ Player* world_cup_t::closestAux(int playerVal, Player* prev, int prevVal, Player
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
     if(minTeamId < 0 || maxTeamId < 0 || maxTeamId < minTeamId)
-        return StatusType::INVALID_INPUT;
+        return output_t<int>(StatusType::INVALID_INPUT);
 
     Team* firstTeamInRange;
+
     try {
         firstTeamInRange = validKnockoutTeams.findFirstInRange(minTeamId);
+        
+        if(firstTeamInRange->getId() > maxTeamId || firstTeamInRange->getId() < minTeamId) {
+            return output_t<int>(StatusType::FAILURE);
+        }
+        
         Team *currentTeam = firstTeamInRange;
         int initialNumTeams = 0;
 
-        while (currentTeam != nullptr && currentTeam->getTeamId() < maxTeamId) {
+        while (currentTeam != nullptr && currentTeam->getTeamId() <= maxTeamId) {
             initialNumTeams++;
             currentTeam = currentTeam->getNextValidRank();
         }
@@ -606,15 +618,15 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 
         int winID = prevArray[0].getKey();
         delete[] prevArray;
-        return winID;
+        return output_t<int>(winID);
     }
 
     catch(const KeyNotFound& keyNotFound) {
-        return StatusType::FAILURE;
+        return output_t<int>(StatusType::FAILURE);
     }
 
     catch (const bad_alloc& badAlloc) {
-        return StatusType::ALLOCATION_ERROR;
+        return output_t<int>(StatusType::ALLOCATION_ERROR);
     }
 
 }

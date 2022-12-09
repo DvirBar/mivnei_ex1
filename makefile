@@ -4,7 +4,9 @@ TESTS_DIR=./WorldCupTests
 O_FILES_DIR=$(TESTS_DIR)/OFiles
 EXEC=WorldCupUnitTester
 TESTS_INCLUDED_FILE=worldcup23a1.h $(TESTS_DIR)/catch.hpp
-OBJS=$(O_FILES_DIR)/UnitTests.o $(O_FILES_DIR)/Team.o $(O_FILES_DIR)/Player.o $(O_FILES_DIR)/worldcup23a1.o # UPDATE HERE ALL THE O FILES YOU CREATED BELOW
+
+OBJS=$(O_FILES_DIR)/UnitTests.o $(O_FILES_DIR)/Team.o $(O_FILES_DIR)/Player.o $(O_FILES_DIR)/worldcup23a1.o $(O_FILES_DIR)/Tuple.o # UPDATE HERE ALL THE O FILES YOU CREATED BELOW
+
 DEBUG_FLAG= -g # can add -g
 COMP_FLAG=--std=c++11 -Wall -Werror -pedantic-errors $(DEBUG_FLAG)
 
@@ -16,20 +18,20 @@ $(O_FILES_DIR)/UnitTests.o : $(TESTS_DIR)/WorldCupTests.cpp
 	$(GPP) -c $(COMP_FLAG) $(TESTS_DIR)/WorldCupTests.cpp -o $@
 
  # UPDATE FROM HERE
-
-$(O_FILES_DIR)/AVLTree.o : AVLTree.cpp AVLTree.h
+	
+$(O_FILES_DIR)/Tuple.o : Tuple.cpp Tuple.h
 	@mkdir -p $(O_FILES_DIR)
-	$(GPP) -c $(COMP_FLAG) AVLTree.cpp -o $@
-
-$(O_FILES_DIR)/Team.o : Team.cpp Team.h Player.h
+	$(GPP) -c $(COMP_FLAG) Tuple.cpp -o $@
+	
+$(O_FILES_DIR)/Team.o : Team.cpp Team.h Player.h AVLTree.h Pair.h Tuple.h Exception.h
 	@mkdir -p $(O_FILES_DIR)
 	$(GPP) -c $(COMP_FLAG) Team.cpp -o $@
 
-$(O_FILES_DIR)/Player.o : Player.cpp Player.h AVLTree.h Team.h
+$(O_FILES_DIR)/Player.o : Player.cpp Player.h AVLTree.h Team.h Pair.h Tuple.h Exception.h
 	@mkdir -p $(O_FILES_DIR)
 	$(GPP) -c $(COMP_FLAG) Player.cpp -o $@
 
-$(O_FILES_DIR)/worldcup23a1.o : worldcup23a1.cpp worldcup23a1.h wet1util.h AVLTree.h Team.h Player.h
+$(O_FILES_DIR)/worldcup23a1.o : worldcup23a1.cpp worldcup23a1.h wet1util.h AVLTree.h Team.h Player.h Tuple.h Pair.h Exception.h
 	@mkdir -p $(O_FILES_DIR)
 	$(GPP) -c $(COMP_FLAG) worldcup23a1.cpp -o $@
 	

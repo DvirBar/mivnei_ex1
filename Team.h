@@ -30,7 +30,6 @@ public:
     int getTotalCards() const;
     int getTotalPoints() const;
     int getTotalGamesPlayed() const;
-    // TODO: implement
     int getId() const;
     const AVLTree<Tuple, Player*>& getStatsTree() const;
     StatusType get_all_players(int* const output);

@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Team.h"
 #include "Exception.h"
+#include "Tuple.h"
 
 Player::Player(
     int playerId, Team* team, int gamesPlayed, int goals,
