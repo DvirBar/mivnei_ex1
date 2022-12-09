@@ -5,8 +5,6 @@
 #include <iostream>
 #include "Pair.h"
 #include "Exception.h"
-#include <cassert>
-#define COUNT 10
 
 using namespace std;
 
@@ -41,22 +39,28 @@ class AVLTree
     AVLNode* root;
     int numNodes;
     AVLNode* execRemove(AVLNode* node);
-    static const AVLNode* searchByNode(const AVLNode* node, const K& key);
+ 
     AVLNode* insertByNode(AVLNode* node, const K& key, const T& data);
     typename AVLTree<K, T>::AVLNode* removeAux(const K& key, AVLNode* node, T* data);
-    void buildNearlyComplete(int size);
-    void removeLeavesAux(AVLNode* node, AVLNode* parent, int size);
+   
     AVLNode* baseRemove(AVLNode* node);
     AVLNode* removeInorder(AVLNode* node, AVLNode* replacedNode);
+    
+    void buildNearlyComplete(int size);
+    void removeLeavesAux(AVLNode* node, AVLNode* parent, int size);
     void treeRotate(AVLNode* node);
     void replaceParent(AVLNode* node, AVLNode* parent);
-    static void buildNearlyCompleteAux(AVLNode* node, int height);
+    
     static int getNodeBalanceFactor(AVLNode* node);
     static int getNodeHeight(AVLNode* node);
     static void deleteTreeAux(AVLNode* node);
+    static void buildNearlyCompleteAux(AVLNode* node, int height);
     static void inorderToArrayAUX(const AVLNode* node, Pair<K,T>* array, int* index);
     static void populateFromArrayAux(AVLNode* node, Pair<K, T>* array, int* index);
+    static const AVLNode* searchByNode(const AVLNode* node, const K& key);
     static const T& firstInRangeAux(AVLNode *node, T* lastValid, const K &range);
+    
+    static const int COUNT = 10;
 
 public:
     AVLTree();
@@ -551,7 +555,6 @@ void AVLTree<K, T>::buildNearlyComplete(int size) {
     if(size <= 0) {
         return;
     }
-    assert(this->isEmpty());
     int height = 0;
     int fullTreeSize = 1;
     
@@ -608,38 +611,5 @@ bool AVLTree<K, T>::AVLNode::isLeaf() {
     return this->leftChild == nullptr && this->rightChild == nullptr;
 }
 
-// TODO: Remove before submission
-//template<class K, class T>
-//void AVLTree<K, T>::debugging_printTree(const std::string& prefix, const AVLTree::AVLNode* node, bool isLeft, std::string& str)
-//{
-//    if( node != nullptr )
-//    {
-//        str += prefix;
-//
-//        str += (isLeft ? "└──" : "├──" );
-//
-//        // print the value of the node
-//        str += std::to_string((*(node->content)).get_id());
-//        str += "\n";
-//
-//        // enter the next tree level - left and right branch
-//        AVLTree<K, T>::debugging_printTree( prefix + (isLeft ? "    " : "│   "), node->right, false, str);
-//        AVLTree<K, T>::debugging_printTree( prefix + (isLeft ? "    " : "│   "), node->left, true, str);
-//    }
-//}
-//
-//template<class K, class T>
-//void AVLTree<K, T>::debugging_printTree(const AVLTree::AVLNode* node, std::string& str)
-//{
-//    debugging_printTree("", node, true, str);
-//}
-//
-//template<class K, class T>
-//std::string AVLTree<K, T>::debugging_printTree()
-//{
-//    std::string tree = "";
-//    debugging_printTree(root, tree);
-//    return tree;
-//}
 #endif // AVLTREE_H_
 
