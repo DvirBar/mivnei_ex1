@@ -9,29 +9,49 @@
 //
 //int main() {
 //    world_cup_t *obj = new world_cup_t();
-//    
+//
 //    obj->add_team(1, 10);
 //    obj->add_team(2, 10);
-////    obj->add_team(2, 30);
-////    obj->add_team(4, 0);
-////
-//    obj->add_player(1, 1, 3, 2, 0, false);
-//    obj->add_player(2, 2, 0, 0, 0, false);
-//    
-//    cout << obj->get_top_scorer(1).ans() << endl;
-//    obj->remove_player(1);
-//    cout << (obj->get_top_scorer(1).status() == StatusType::SUCCESS) << endl;
-////    obj->add_player(2, 1, 1, 1, 0, false);
-////    obj->add_player(3, 1, 4, 1, 2, false);
-////    obj->add_player(4, 1, 1, 1, 0, true);
-////    obj->add_player(5, 2, 1, 1, 0, true);
-////    obj->add_player(6, 2, 1, 1, 5, false);
-////    obj->add_player(7, 2, 1, 1, 0, false);
-////    obj->add_player(8, 2, 1, 3, 0, false);
-////    cout << "top scorer 1: " << obj->get_top_scorer(1).ans() << endl;
-////    cout << "top scorer 2: " << obj->get_top_scorer(2).ans() << endl;
-////
-////    obj->unite_teams(1, 2, 1);
-////
-////    cout << "top scorer unite: " << obj->get_top_scorer(1).ans() << endl;
+//    obj->add_team(3, 5);
+//    obj->add_team(4, 5);
+//    // obj->add_player(<#int playerId#>, <#int teamId#>, <#int gamesPlayed#>, <#int goals#>, <#int cards#>, <#bool goalKeeper#>)
+//    obj->add_player(200, 1, 3, 2, 0, true);
+//    for(int i=1; i<11; i++) {
+//        obj->add_player(i, 1, 1, 2, 0, false);
+//    }
+//
+//    obj->add_player(201, 2, 1, 0, 0, true);
+//    for(int i=0; i<11; i++) {
+//        obj->add_player(i+20, 2, 1, 0, 0, false);
+//    }
+//
+//    obj->add_player(202, 3, 1, 0, 0, true);
+//    for(int i=0; i<11; i++) {
+//        obj->add_player(i+3000, 3, i+2, 0, 0, false);
+//    }
+//
+//
+//    obj->play_match(1, 2);
+//    obj->play_match(1, 2);
+//    obj->play_match(1, 2);
+//    obj->play_match(1, 2);
+//    obj->play_match(1, 2);
+//    obj->play_match(2, 3);
+//    obj->play_match(2, 3);
+//    obj->play_match(2, 3);
+//    obj->play_match(2, 3);
+////    cout << obj->get_num_played_games(1).ans() << endl;
+//    cout << obj->get_num_played_games(1).ans() << endl;
+////    obj->update_player_stats(1, 3, 0, 0);
+////    cout << obj->get_num_played_games(1).ans() << endl;
+////    cout << obj->get_num_played_games(20).ans() << endl;
+//    obj->unite_teams(1, 2, 8);
+//    cout << obj->get_num_played_games(1).ans() << endl;
+////    cout << obj->get_num_played_games(20).ans() << endl;
+//    obj->play_match(8, 3);
+//    obj->play_match(8, 3);
+//    obj->play_match(8, 3);
+//    obj->unite_teams(1, 4, 8);
+//    cout << obj->get_num_played_games(1).ans() << endl;
+//
 //}

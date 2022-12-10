@@ -236,7 +236,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
         
         Team* team = player->getTeam();
         player->setGoals(player->getGoals() + scoredGoals);
-        player->setGamesPlayed(player->getNumPlayedGames() + gamesPlayed);
+        player->setGamesPlayed(player->getNumPlayedGames() + gamesPlayed-team->getTotalGamesPlayed());
         player->setCards(player->getCards() + cardsReceived);
         
         addPlayerAux(player, team);
@@ -355,7 +355,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         if(newTeam->isValidTeam()) {
             addValidTeam(newTeam);
         }
-        
+
         return StatusType::SUCCESS;
     } catch (const KeyNotFound& error) {
         return StatusType::FAILURE;

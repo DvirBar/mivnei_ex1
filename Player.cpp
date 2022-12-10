@@ -70,8 +70,9 @@ void Player::setIsGoalKeeper(bool isGoalKeeper) {
     this->goalKeeper = isGoalKeeper;
 }
 
+
 void Player::setGamesPlayed(int gamesPlayed) {
-    this->gamesPlayed = gamesPlayed-team->getTotalGamesPlayed();
+    this->gamesPlayed = gamesPlayed;
 }
 
 Player* Player::getRankNext() const {
