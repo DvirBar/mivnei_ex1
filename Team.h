@@ -59,6 +59,7 @@ public:
     // TODO: implement
     static void mergeArrays(Player** newArr, int newArrSize, Player** arr1,
                             int arr1Size, Player** arr2, int arr2Size);
+    Player* findPrev(Player *player);
     
     class TeamNotFound: public exception{};
 private:

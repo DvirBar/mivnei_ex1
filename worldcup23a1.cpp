@@ -202,8 +202,10 @@ Player* world_cup_t::removePlayerAux(int playerId) {
         rankPrev->updateNextInRank(rankNext);
     }
     
-
+    
     Team* team = removedPlayer->getTeam();
+    Player* teamPrev = team->findPrev(removedPlayer);
+    
     bool wasValid = team->isValidTeam();
     removedPlayer->removeFromTeam();
 
@@ -216,8 +218,9 @@ Player* world_cup_t::removePlayerAux(int playerId) {
     }
     
     if(team->getTopScorer()->getId() == removedPlayer->getId()) {
-        team->setTopScorer(removedPlayer->getRankPrev());
+        team->setTopScorer(teamPrev);
     }
+    
     return removedPlayer;
 }
 

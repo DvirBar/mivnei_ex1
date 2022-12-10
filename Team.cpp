@@ -230,3 +230,12 @@ void Team::updateTopScorer(Player *player) {
        teamTopScorer->getStatsTuple() < player->getStatsTuple())
         teamTopScorer = player;
 }
+
+Player* Team::findPrev(Player* player) {
+    try {
+        return teamPlayersByStats.prevInorder(player->getStatsTuple());
+    } catch(const NoPrevInorder& error) {
+        return nullptr;
+    }
+    
+}
