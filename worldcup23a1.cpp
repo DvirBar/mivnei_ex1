@@ -325,7 +325,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     if(newTeamId <= 0 || teamId1 <= 0 || teamId2 <= 0 || teamId1 == teamId2) {
         return StatusType::INVALID_INPUT;
     }
-    
+
     try {
         Team* team1 = teams.search(teamId1);
         Team* team2 = teams.search(teamId2);
@@ -352,7 +352,6 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         if(newTeam->isValidTeam()) {
             addValidTeam(newTeam);
         }
-        
         
         return StatusType::SUCCESS;
     } catch (const KeyNotFound& error) {

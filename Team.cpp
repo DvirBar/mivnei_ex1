@@ -99,7 +99,6 @@ Team* Team::unite_teams(Team* team1, Team* team2, int newTeamId) {
     // TODO: update stats
     newTeam->setCards(team1->getTotalCards()+team2->getTotalCards());
     newTeam->setGoals(team1->getTotalGoals()+team2->getTotalGoals());
-    newTeam->addPoints(team1->getTotalPoints()+team2->getTotalPoints());
     newTeam->setGoalGoalKeepers(team1->getNumGoalKeepers()+team2->getNumGoalKeepers());
     newTeam->uniteTopScorers(team1, team2);
     

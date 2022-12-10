@@ -9,22 +9,23 @@
 //
 //int main() {
 //    world_cup_t *obj = new world_cup_t();
-//    int playerId = 1;
-//    StatusType res;
-//    for (int teamId = 1; teamId < 10; teamId += 2)
-//    {
-//        res = obj->add_team(teamId, 1000 / ((6 - teamId) * (6 - teamId)));
+//    obj->add_team(1, 10);
+//    obj->add_team(2, 30);
+//    obj->add_team(4, 0);
 //
-//        for (int startingId = playerId; playerId < startingId + 10 + teamId; ++playerId)
-//        {
-//            res = obj->add_player(playerId, teamId, 1, playerId, 3, true);
-//        }
-//        ++playerId;
-//    }
+//    obj->add_player(1, 1, 3, 2, 0, false);
+//    obj->add_player(2, 1, 1, 1, 0, false);
+//    obj->add_player(3, 1, 4, 1, 2, false);
+//    obj->add_player(4, 1, 1, 1, 0, true);
+//    obj->add_player(5, 2, 1, 1, 0, true);
+//    obj->add_player(6, 2, 1, 1, 5, false);
+//    obj->add_player(7, 2, 1, 1, 0, false);
+//    obj->add_player(8, 2, 1, 3, 0, false);
 //
-//    res = obj->add_team(4, 1000000);
+//    cout << obj->get_num_played_games(3).ans() << endl;
 //
-//    output_t<int> res1 = obj->knockout_winner(8, 9);
-//    cout << res1.ans();
-//    delete obj;
+//    obj->unite_teams(1, 2, 1);
+//    cout << endl;
+//    cout << obj->get_num_played_games(3).ans() << endl;
+//
 //}
